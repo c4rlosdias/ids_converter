@@ -3,6 +3,13 @@ import streamlit as st
 import datetime
 import ifcopenshell
 
+st.set_page_config(
+     page_title="IDS Converter",
+     page_icon="🔄",
+     layout="wide",
+     initial_sidebar_state="expanded",
+)
+
 if True not in st.session_state:
     st.session_state.disabled = False
 
@@ -20,12 +27,16 @@ dic = {'specification name' : ['specifiation 01', 'specification 01', 'specifica
        }
 
 df_sample = pd.DataFrame(dic)
-dic_sep = {',' : ',', ';' : ';', 'TAB' : '\t'}
+dic_sep = { 'TAB' : '\t',',' : ',', ';' : ';'}
 
 with st.sidebar:
-    st.title('IDS Conversor')
-    sep = st.selectbox('Choose separator:', (',', ';', 'TAB'))
+    st.title('IDS Converter')
+    st.image('.\img\LOGO 1X1_2.PNG', width=150)
+    st.write('_By Carlos Dias_')
+    sep = st.selectbox('Choose separator:',('TAB', ',', ';'))
+    st.divider()
     uploaded_file = st.file_uploader("Choose a CSV file", type=['csv'])
+    
 
 if uploaded_file is not None:
 
@@ -48,16 +59,18 @@ if uploaded_file is not None:
     st.divider()
 
     with st.container():
+        st.markdown(':white_check_mark: :green[check your specification:]')
         df = pd.read_csv(uploaded_file, sep=dic_sep[sep])
         st.dataframe(df, use_container_width=False)
     
     st.divider()
+    
 
     submitted = st.button("Convert to IDS ▶️")        
     st.write("Title", title, "version", version) 
 
 else:
-    st.header("IDS Conversor")
+    st.header("IDS Converter")
     st.write('_By Carlos Dias_')
     st.divider()
     st.markdown('IDS Conversor is a file format conversor by :green[CSV file] to :blue[IDS file].')
