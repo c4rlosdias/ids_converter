@@ -31,7 +31,7 @@ dic_sep = { 'TAB' : '\t',',' : ',', ';' : ';'}
 
 with st.sidebar:
     st.title('IDS Converter')
-    st.image('.\img\LOGO 1X1_2.PNG', width=150)
+    st.image('.\\img\\LOGO 1X1_2.PNG', width=150)
     st.write('_By Carlos Dias_')
     sep = st.selectbox('Choose separator:',('TAB', ',', ';'))
     st.divider()
