@@ -2,7 +2,7 @@ import pandas as pd
 import streamlit as st
 import datetime
 import ifcopenshell
-from ifctester import ids, reporter
+from modules.ifctester import ids
 
 st.set_page_config(
      page_title="IDS Converter",
@@ -110,19 +110,7 @@ if uploaded_file is not None:
                 with open("./sample/IDS.ids") as f:
                     st.download_button('Download IDS file', f, file_name=uploaded_file.name.split('.')[0] + '.ids')
 
-
-            
-
-
-
-   
-        
-
-
-
-        
-
-        
+     
 
 else:
     st.header("IDS Converter")
