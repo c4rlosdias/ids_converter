@@ -1,0 +1,132 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ids xmlns="http://standards.buildingsmart.org/IDS" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://standards.buildingsmart.org/IDS/ids_09.xsd">
+    <info>
+        <title>Untitled</title>
+        <author>xxxxx@xxxxx.xxx</author>
+        <date>2023-04-09</date>
+    </info>
+    <specifications>
+        <specification name="teste" ifcVersion="IFC2X3" minOccurs="0" maxOccurs="unbounded">
+            <applicability>
+                <entity>
+                    <name>
+                        <simpleValue>IFCWALL</simpleValue>
+                    </name>
+                    <predefinedType>
+                        <simpleValue>SOLIDWALL</simpleValue>
+                    </predefinedType>
+                </entity>
+            </applicability>
+            <requirements>
+                <property measure="IfcBoolean" minOccurs="1" maxOccurs="1">
+                    <propertySet>
+                        <simpleValue>Pset_WallCommon</simpleValue>
+                    </propertySet>
+                    <name>
+                        <simpleValue>IsExternal</simpleValue>
+                    </name>
+                    <value>
+                        <simpleValue>True</simpleValue>
+                    </value>
+                </property>
+                <property measure="IfcInteger" minOccurs="1" maxOccurs="1">
+                    <propertySet>
+                        <simpleValue>Foo_Bar</simpleValue>
+                    </propertySet>
+                    <name>
+                        <simpleValue>Foo</simpleValue>
+                    </name>
+                    <value>
+                        <simpleValue>assada</simpleValue>
+                    </value>
+                </property>
+                <property measure="IfcInteger" minOccurs="1" maxOccurs="1">
+                    <propertySet>
+                        <simpleValue>adasdasdas3</simpleValue>
+                    </propertySet>
+                    <name>
+                        <simpleValue>asdas1</simpleValue>
+                    </name>
+                    <value>
+                        <simpleValue>asdsa</simpleValue>
+                    </value>
+                </property>
+                <property measure="IfcInteger" minOccurs="1" maxOccurs="1">
+                    <propertySet>
+                        <simpleValue>adasdasdas4</simpleValue>
+                    </propertySet>
+                    <name>
+                        <simpleValue>asdas2</simpleValue>
+                    </name>
+                </property>
+                <property measure="IfcInteger" minOccurs="1" maxOccurs="1">
+                    <propertySet>
+                        <simpleValue>adasdasdas5</simpleValue>
+                    </propertySet>
+                    <name>
+                        <simpleValue>asdas3</simpleValue>
+                    </name>
+                </property>
+                <property measure="IfcInteger" minOccurs="1" maxOccurs="1">
+                    <propertySet>
+                        <simpleValue>adasdasdas6</simpleValue>
+                    </propertySet>
+                    <name>
+                        <simpleValue>asdas4</simpleValue>
+                    </name>
+                </property>
+            </requirements>
+        </specification>
+        <specification name="teste2" ifcVersion="IFC2X3" minOccurs="0" maxOccurs="unbounded">
+            <applicability>
+                <entity>
+                    <name>
+                        <simpleValue>IFCWALL</simpleValue>
+                    </name>
+                </entity>
+            </applicability>
+            <requirements>
+                <property measure="IfcInteger" minOccurs="1" maxOccurs="1">
+                    <propertySet>
+                        <simpleValue>adasdasdas7</simpleValue>
+                    </propertySet>
+                    <name>
+                        <simpleValue>asdas5</simpleValue>
+                    </name>
+                </property>
+                <property measure="IfcInteger" minOccurs="1" maxOccurs="1">
+                    <propertySet>
+                        <simpleValue>adasdasdas8</simpleValue>
+                    </propertySet>
+                    <name>
+                        <simpleValue>asdas6</simpleValue>
+                    </name>
+                </property>
+                <property measure="IfcInteger" minOccurs="1" maxOccurs="1">
+                    <propertySet>
+                        <simpleValue>adasdasdas9</simpleValue>
+                    </propertySet>
+                    <name>
+                        <simpleValue>asdas7</simpleValue>
+                    </name>
+                </property>
+                <property measure="IfcInteger" minOccurs="1" maxOccurs="1">
+                    <propertySet>
+                        <simpleValue>adasdasdas10</simpleValue>
+                    </propertySet>
+                    <name>
+                        <simpleValue>asdas8</simpleValue>
+                    </name>
+                </property>
+                <property measure="IfcInteger" minOccurs="1" maxOccurs="1">
+                    <propertySet>
+                        <simpleValue>adasdasdas11</simpleValue>
+                    </propertySet>
+                    <name>
+                        <simpleValue>asdas9</simpleValue>
+                    </name>
+                </property>
+            </requirements>
+        </specification>
+    </specifications>
+</ids>

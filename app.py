@@ -2,6 +2,7 @@ import pandas as pd
 import streamlit as st
 import datetime
 import ifcopenshell
+from ifctester import ids, reporter
 
 st.set_page_config(
      page_title="IDS Converter",
@@ -48,26 +49,80 @@ if uploaded_file is not None:
             copyright   = st.text_input('_Copyright:_')
             version     = st.text_input('_Version:_')
             author      = st.text_input('_Author:_', 'xxxxx@xxxxx.xxx')
-            ifc_version = st.selectbox('_IFC Version:_', ('IFC2x3', 'IFC4', 'IFC4X3'))
+            ifc_version = st.selectbox('_IFC Version:_', ('IFC2X3', 'IFC4', 'IFC4X3'))
                         
         with col2:
-            date        = st.date_input('_Date:_', datetime.date.today())
+            date        = st.text_input('_Date:_', datetime.date.today())
             description = st.text_input('_Description:_')
             purpose     = st.text_input('_Purpose:_')
             milestone   = st.text_input('_Milestone:_')
     
     st.divider()
+    st.write(ifc_version)
 
     with st.container():
         st.markdown(':white_check_mark: :green[check your specification:]')
-        df = pd.read_csv(uploaded_file, sep=dic_sep[sep])
-        st.dataframe(df, use_container_width=False)
-    
-    st.divider()
-    
+        df = pd.read_csv(uploaded_file, sep=dic_sep[sep], keep_default_na=False)
+        df_group = df.groupby(['specification name', 'entity', 'predefinedType'])
 
-    submitted = st.button("Convert to IDS ▶️")        
-    st.write("Title", title, "version", version) 
+        for spec, frame in df_group:
+            st.markdown('**SPECIFICATION:**')
+            st.markdown(':green[Specification Name :]' + spec[0])
+            st.markdown('**APPLICABILITY:**')
+            st.write(f':green[Entity :]{spec[1]} - ', f':green[PredefinedType :]{spec[2]}')
+            st.markdown('**REQUIREMENTS:**')
+            st.write(frame[['property name',
+                            'property type',
+                            'property set',
+                            'property value']]
+            )
+
+        st.divider()
+
+        # Conversao
+        submitted = st.button("Convert to IDS ▶️")    
+        if submitted:
+            my_ids= ids.Ids(title=title, 
+                            copyright=copyright, 
+                            version=version, 
+                            author=author, 
+                            description=description, 
+                            date=date,
+                            purpose=purpose, 
+                            milestone=milestone
+            )   
+            for spec, frame in df_group:
+                my_spec = ids.Specification(name=spec[0], ifcVersion=ifc_version)
+                my_spec.applicability.append(ids.Entity(name=spec[1], predefinedType=None if spec[2] == '' else spec[2]))
+                for index, row in frame.iterrows():
+                    property = ids.Property(
+                        name=row['property name'],
+                        value=None if row['property value']=='' else row['property value'],
+                        propertySet=row['property set'],
+                        measure=row['property type']
+                    )
+                    my_spec.requirements.append(property)
+                my_ids.specifications.append(my_spec)
+            
+            result = my_ids.to_xml("./sample/IDS.ids")
+            if result:
+                st.balloons()
+                with open("./sample/IDS.ids") as f:
+                    st.download_button('Download IDS file', f, file_name=uploaded_file.name.split('.')[0] + '.ids')
+
+
+            
+
+
+
+   
+        
+
+
+
+        
+
+        
 
 else:
     st.header("IDS Converter")

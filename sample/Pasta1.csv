@@ -5,8 +5,8 @@ teste	IFCWALL	SOLIDWALL	asdas1	IfcInteger	adasdasdas3	asdsa
 teste	IFCWALL	SOLIDWALL	asdas2	IfcInteger	adasdasdas4	
 teste	IFCWALL	SOLIDWALL	asdas3	IfcInteger	adasdasdas5	
 teste	IFCWALL	SOLIDWALL	asdas4	IfcInteger	adasdasdas6	
-teste2	IFCWALL	SOLIDWALL	asdas5	IfcInteger	adasdasdas7	
-teste2	IFCWALL	SOLIDWALL	asdas6	IfcInteger	adasdasdas8	
-teste2	IFCWALL	SOLIDWALL	asdas7	IfcInteger	adasdasdas9	
-teste2	IFCWALL	SOLIDWALL	asdas8	IfcInteger	adasdasdas10	
-teste2	IFCWALL	SOLIDWALL	asdas9	IfcInteger	adasdasdas11	
+teste2	IFCWALL		asdas5	IfcInteger	adasdasdas7	
+teste2	IFCWALL		asdas6	IfcInteger	adasdasdas8	
+teste2	IFCWALL		asdas7	IfcInteger	adasdasdas9	
+teste2	IFCWALL		asdas8	IfcInteger	adasdasdas10	
+teste2	IFCWALL		asdas9	IfcInteger	adasdasdas11	
