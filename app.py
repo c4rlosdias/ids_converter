@@ -32,7 +32,7 @@ dic_sep = { 'TAB' : '\t',',' : ',', ';' : ';'}
 
 with st.sidebar:
     st.title('IDS Converter')
-    st.image('./img/LOGO 1X1_2.PNG', width=150)
+    st.image('./resources/img/LOGO 1X1_2.PNG', width=150)
     st.write('_By Carlos Dias_')
     sep = st.selectbox('Choose separator:',('TAB', ',', ';'))
     st.divider()
@@ -103,12 +103,12 @@ if uploaded_file is not None:
                     )
                     my_spec.requirements.append(property)
                 my_ids.specifications.append(my_spec)
-            
-            result = my_ids.to_xml("./sample/IDS.ids")
+           
+            result = my_ids.to_string()
             if result:
                 st.balloons()
-                with open("./sample/IDS.ids") as f:
-                    st.download_button('Download IDS file', f, file_name=uploaded_file.name.split('.')[0] + '.ids')
+                st.download_button('Download IDS file', result, file_name=uploaded_file.name.split('.')[0] + '.ids', mime='xml')
+
 
      
 
