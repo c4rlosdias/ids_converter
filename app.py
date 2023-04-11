@@ -14,19 +14,19 @@ st.set_page_config(
 if True not in st.session_state:
     st.session_state.disabled = False
 
-dic = {'specification name' : ['specifiation 01', 'specification 01', 'specification 02'],
-       'specification description' : ['description of specification 01','description of specification 01','description of specification 02'],
-       'specification instructions' : ['instructions 01', 'istructions 01', 'instructions 02'],
-       'entity' : ['IFCWALL', 'IFCWALL', 'IFCDOOR'],
-       'predefined type' : ['WALLSTANDARDCASE', 'WALLSTANDARDCASE', 'DOORSTANDARDCASE'],
-       'property name' : ['IsExternal', 'IsBearing', 'ssss'],       
-       'property type' : ['IFcBoolean', 'IFCBoolean', 'IfcInteger'],
-       'property set' : ['Pset_WallCommon', 'Pset_WallCommon', 'Pset_DoorCommom'],
-       'property value' : ['True', 'True', '40'],
+dic = {'specification name' : ['SPEC_01', 'SPEC_01', 'SPEC_02'],
+       'specification description' : ['Walls needs this properties', 'Walls needs this properties', 'Slabs needs area'],
+       'entity' : ['IFCWALL', 'IFCWALL', 'IFCSLAB'],
+       'predefined type' : ['STANDARD', 'STANDARD', 'FLOOR'],
+       'property name' : ['IsExternal', 'LoadBearing', 'GrossArea'],       
+       'property type' : ['IFcBoolean', 'IFCBoolean', 'IfcAreaMeasure'],
+       'property set' : ['Pset_WallCommon', 'Pset_WallCommon', 'Pset_SlabCommom'],
+       'property value' : ['True', 'True', ''],
        'optionality' : ['Required','Optional', 'Prohibited' ]
        }
 
 df_sample = pd.DataFrame(dic)
+df_sample.set_index('specification name')
 dic_sep = { 'TAB' : '\t',',' : ',', ';' : ';'}
 
 with st.sidebar:
@@ -35,7 +35,10 @@ with st.sidebar:
     st.write('_By Carlos Dias_')
     sep = st.selectbox('Choose separator:',('TAB', ',', ';'))
     st.divider()
-    uploaded_file = st.file_uploader("Choose a CSV file", type=['csv'])
+    uploaded_file = st.file_uploader("📥 Choose a CSV file", type=['csv'])
+    st.divider()
+    st.image('./resources/img/github-logo.PNG', width=50)    
+    st.write('https://github.com/c4rlosdias/ids_converter')
     
 
 if uploaded_file is not None:
@@ -60,22 +63,23 @@ if uploaded_file is not None:
     st.write(ifc_version)
 
     with st.container():
-        st.markdown(':white_check_mark: :green[check your specification:]')
+        st.markdown(':white_check_mark: :green[check your specifications:]')
         df = pd.read_csv(uploaded_file, sep=dic_sep[sep], keep_default_na=False)
-        df_group = df.groupby(['specification name', 'entity', 'predefinedType'])
+        df_group = df.groupby(['specification name', 'specification description','entity', 'predefinedType'])
 
         for spec, frame in df_group:
-            st.markdown('**SPECIFICATION:**')
-            st.markdown(':green[Specification Name :]' + spec[0])
-            st.markdown('**APPLICABILITY:**')
-            st.write(f':green[Entity :]{spec[1]} - ', f':green[PredefinedType :]{spec[2]}')
-            st.markdown('**REQUIREMENTS:**')
-            st.write(frame[['property name',
-                            'property type',
-                            'property set',
-                            'property value',
-                            'optionality']]
-            )
+            
+            with st.expander(':green[Specification Name :]' + spec[0]):
+                st.markdown(f':green[Description:]{spec[1]}')
+                st.markdown('**APPLICABILITY:**')
+                st.write(f':green[Entity :]{spec[2]} - ', f':green[PredefinedType :]{spec[3]}')
+                st.markdown('**REQUIREMENTS:**')
+                st.write(frame[['property name',
+                                'property type',
+                                'property set',
+                                'property value',
+                                'optionality']]
+                )
 
         st.divider()
 
@@ -92,16 +96,17 @@ if uploaded_file is not None:
                             milestone=milestone
             )   
             for spec, frame in df_group:
-                my_spec = ids.Specification(name=spec[0], ifcVersion=ifc_version)
-                my_spec.applicability.append(ids.Entity(name=spec[1], predefinedType=None if spec[2] == '' else spec[2]))
+                my_spec = ids.Specification(name=spec[0], description=spec[1], ifcVersion=ifc_version)
+                my_spec.applicability.append(ids.Entity(name=spec[2], predefinedType=None if spec[3] == '' else spec[2]))
                 for index, row in frame.iterrows():
+                    # insere requisito de propriedade
                     property = ids.Property(
                         name=row['property name'],
                         value=None if row['property value']=='' else row['property value'],
                         propertySet=row['property set'],
                         measure=row['property type'],
-                        minOccurs=0 if row['optionality'] in ['Optional', 'Prohibited'] else 1,
-                        maxOccurs='unbounded' if row['optionality'] in ['Required', 'Optional'] else 0 
+                        minOccurs=0 if row['optionality'].upper() in ['OPTIONAL', 'PROHIBITED'] else 1,
+                        maxOccurs='unbounded' if row['optionality'].upper() in ['REQUIRED', 'OPTIONAL'] else 0 
                     )
                     
                     my_spec.requirements.append(property)
@@ -116,17 +121,35 @@ if uploaded_file is not None:
      
 
 else:
+    st.image('./resources/img/ids-logo.PNG', width=100)
+    st.markdown('™️')
     st.header("IDS Converter")
     st.write('_By Carlos Dias_')
-    st.divider()
+
+    st.markdown('')
     st.markdown('IDS Converter converts a :green[CSV file] to :blue[IDS file].')
-    st.markdown('the CSV file needs to have specific columns and in the correct order, as in the example below:')
-    st.dataframe(df_sample)
+    st.markdown('IDs is a standard that describes information exchange requirements and has incredible potential. ' +
+                'This converter, however, serves to create an ids with simple specifications, capable of indicating' + 
+                ' which properties and values the model needs to have for each ifc type')
+    
     st.divider()
-    st.markdown('Columns 1, 2 and 3 correspond to the name, description and instructions for a given specification. Note that several lines can be part of the same specification.')
-    st.markdown('Columns 4 and 5 correspond to the applicability of the specification. What entities does this specification refer to.')
-    st.markdown('All other columns correspond to information requirements that the entity needs to meet.')
-    st.markdown('Now, use the sidebar to upload your CSV file')
+    st.markdown('the CSV file needs to have specific columns described bellow:')
+    st.markdown(':blue[_specification name_] -> Specification name or code (necessary)')
+    st.markdown(':blue[_specification description_] -> Specification description (optional)')
+    st.markdown(':blue[_entity_] -> ifc type of the elements to be checked (necessary)')
+    st.markdown(':blue[_predefinedType_] -> predefined type of the elements to be checked (optional)')
+    st.markdown(':blue[_property name_] -> requested property name (necessary)')
+    st.markdown(':blue[_property type_] -> data type of the requested property (necessary)')
+    st.markdown(':blue[_property set_] -> property set name (necessary)')
+    st.markdown(':blue[_property value_] -> value requested in the property, when there is one (optional)')
+    st.markdown(':blue[_optionality_] -> property optionality, which can be :green[Required], :green[Optional], '+
+                ' or :green[Prohibited] (necessary)')
+    st.markdown('Example:')
+    st.dataframe(df_sample)
+    st.markdown('⚠️ Note that the same specification can occupy more than one row of the table!')
+    st.divider()
+
+    st.markdown('☑️ Now, use the sidebar to upload your CSV file! 👊')
     
 
 

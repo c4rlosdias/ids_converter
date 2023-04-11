@@ -1,0 +1,96 @@
+specification name	specification description	entity	predefinedType	property set	property name	property type	optionality	property value			
+ARQUITETURA	propriedades necessárias para a arquitetura	IFCWALL	STANDARD	CISCEA_IDENTIFICAÇÃO	Descrição	IfcLabel	required				
+ARQUITETURA	propriedades necessárias para a arquitetura	IFCWALL	STANDARD	CISCEA_QUANTIDADES	Área	IfcAreaMeasure	required				
+ARQUITETURA	propriedades necessárias para a arquitetura	IFCCOVERING	CLADDING	CISCEA_IDENTIFICAÇÃO	Descrição	IfcLabel	required				
+ARQUITETURA	propriedades necessárias para a arquitetura	IFCCOVERING	CLADDING	CISCEA_QUANTIDADES	Área	IfcAreaMeasure	required				
+ARQUITETURA	propriedades necessárias para a arquitetura	IFCCOVERING	FLOORING	CISCEA_IDENTIFICAÇÃO	Descrição	IfcLabel	required				
+ARQUITETURA	propriedades necessárias para a arquitetura	IFCCOVERING	FLOORING	CISCEA_QUANTIDADES	Área	IfcAreaMeasure	required				
+ARQUITETURA	propriedades necessárias para a arquitetura	IFCSLAB	FLOOR	CISCEA_IDENTIFICAÇÃO	Descrição	IfcLabel	required				
+ARQUITETURA	propriedades necessárias para a arquitetura	IFCSLAB	FLOOR	CISCEA_QUANTIDADES	Área	IfcAreaMeasure	required				
+ARQUITETURA	propriedades necessárias para a arquitetura	IFCROOF		CISCEA_IDENTIFICAÇÃO	Descrição	IfcLabel	required				
+ARQUITETURA	propriedades necessárias para a arquitetura	IFCROOF		CISCEA_QUANTIDADES	Área	IfcAreaMeasure	required				
+ARQUITETURA	propriedades necessárias para a arquitetura	IFCDOOR		CISCEA_IDENTIFICAÇÃO	Descrição	IfcLabel	required				
+ARQUITETURA	propriedades necessárias para a arquitetura	IFCDOOR		CISCEA_IDENTIFICAÇÃO	Tag	IfcLabel	required				
+ARQUITETURA	propriedades necessárias para a arquitetura	IFCWINDOW		CISCEA_IDENTIFICAÇÃO	Descrição	IfcLabel	required				
+ARQUITETURA	propriedades necessárias para a arquitetura	IFCWINDOW		CISCEA_IDENTIFICAÇÃO	Tag	IfcLabel	required				
+ARQUITETURA	propriedades necessárias para a arquitetura	IFCWINDOW		CISCEA_IDENTIFICAÇÃO	Área	IfcAreaMeasure	required				
+ARQUITETURA	propriedades necessárias para a arquitetura	IFCFURNITURE		CISCEA_IDENTIFICAÇÃO	Descrição	IfcLabel	required				
+ARQUITETURA	propriedades necessárias para a arquitetura	IFCRAILING		CISCEA_IDENTIFICAÇÃO	Descrição	IfcLabel	required				
+ARQUITETURA	propriedades necessárias para a arquitetura	IFCRAILING		CISCEA_QUANTIDADES	Comprimento	IfcLengthMeasure	required				
+ARQUITETURA	propriedades necessárias para a arquitetura	IFCCURTAINWALL		CISCEA_IDENTIFICAÇÃO	Descrição	IfcLabel	required				
+ARQUITETURA	propriedades necessárias para a arquitetura	IFCCURTAINWALL		CISCEA_QUANTIDADES	Área	IfcAreaMeasure	required				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCCOLUMN		CISCEA_IDENTIFICAÇÃO	Concreto aparente	IfcBoolean	required				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCCOLUMN		CISCEA_IDENTIFICAÇÃO	Concreto fck	IfcLabel	required				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCCOLUMN		CISCEA_QUANTIDADES	Volume de Concreto	IfcVolumeMeasure	required				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCCOLUMN		CISCEA_QUANTIDADES	Área de Fôrma	IfcAreaMeasure	required				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCCOLUMN		CISCEA_QUANTIDADES	Peso_Ø5.00	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCCOLUMN		CISCEA_QUANTIDADES	Peso_Ø6.30	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCCOLUMN		CISCEA_QUANTIDADES	Peso_Ø8.00	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCCOLUMN		CISCEA_QUANTIDADES	Peso_Ø10.00	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCCOLUMN		CISCEA_QUANTIDADES	Peso_Ø12.50	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCCOLUMN		CISCEA_QUANTIDADES	Peso_Ø16.00	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCCOLUMN		CISCEA_QUANTIDADES	Peso_Ø20.00	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCCOLUMN		CISCEA_QUANTIDADES	Peso_Ø25.00	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCBEAM		CISCEA_IDENTIFICAÇÃO	Concreto aparente	IfcBoolean	required				 
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCBEAM		CISCEA_IDENTIFICAÇÃO	Concreto fck	IfcLabel	required				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCBEAM		CISCEA_QUANTIDADES	Volume de Concreto	IfcVolumeMeasure	required				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCBEAM		CISCEA_QUANTIDADES	Área de Fôrma	IfcAreaMeasure	required				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCBEAM		CISCEA_QUANTIDADES	Peso_Ø5.00	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCBEAM		CISCEA_QUANTIDADES	Peso_Ø6.30	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCBEAM		CISCEA_QUANTIDADES	Peso_Ø8.00	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCBEAM		CISCEA_QUANTIDADES	Peso_Ø10.00	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCBEAM		CISCEA_QUANTIDADES	Peso_Ø12.50	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCBEAM		CISCEA_QUANTIDADES	Peso_Ø16.00	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCBEAM		CISCEA_QUANTIDADES	Peso_Ø20.00	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCBEAM		CISCEA_QUANTIDADES	Peso_Ø25.00	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCSLAB		CISCEA_IDENTIFICAÇÃO	Concreto aparente	IfcBoolean	required				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCSLAB		CISCEA_IDENTIFICAÇÃO	Concreto fck	IfcLabel	required				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCSLAB		CISCEA_QUANTIDADES	Volume de Concreto	IfcVolumeMeasure	required				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCSLAB		CISCEA_QUANTIDADES	Área de Fôrma	IfcAreaMeasure	required				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCSLAB		CISCEA_QUANTIDADES	Peso_Ø5.00	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCSLAB		CISCEA_QUANTIDADES	Peso_Ø6.30	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCSLAB		CISCEA_QUANTIDADES	Peso_Ø8.00	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCSLAB		CISCEA_QUANTIDADES	Peso_Ø10.00	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCSLAB		CISCEA_QUANTIDADES	Peso_Ø12.50	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCSLAB		CISCEA_QUANTIDADES	Peso_Ø16.00	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCSLAB		CISCEA_QUANTIDADES	Peso_Ø20.00	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCSLAB		CISCEA_QUANTIDADES	Peso_Ø25.00	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCSTAIR		CISCEA_IDENTIFICAÇÃO	Concreto fck	IfcLabel	required				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCSTAIR		CISCEA_QUANTIDADES	Volume de Concreto	IfcVolumeMeasure	required				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCSTAIR		CISCEA_QUANTIDADES	Área de Fôrma	IfcAreaMeasure	required				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCSTAIR		CISCEA_QUANTIDADES	Peso_Ø5.00	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCSTAIR		CISCEA_QUANTIDADES	Peso_Ø6.30	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCSTAIR		CISCEA_QUANTIDADES	Peso_Ø8.00	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCSTAIR		CISCEA_QUANTIDADES	Peso_Ø10.00	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCSTAIR		CISCEA_QUANTIDADES	Peso_Ø12.50	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCSTAIR		CISCEA_QUANTIDADES	Peso_Ø16.00	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCSTAIR		CISCEA_QUANTIDADES	Peso_Ø20.00	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCSTAIR		CISCEA_QUANTIDADES	Peso_Ø25.00	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCRAMP		CISCEA_IDENTIFICAÇÃO	Concreto fck	IfcLabel	required				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCRAMP		CISCEA_QUANTIDADES	Volume de Concreto	IfcVolumeMeasure	required				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCRAMP		CISCEA_QUANTIDADES	Área de Fôrma	IfcAreaMeasure	required				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCRAMP		CISCEA_QUANTIDADES	Peso_Ø5.00	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCRAMP		CISCEA_QUANTIDADES	Peso_Ø6.30	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCRAMP		CISCEA_QUANTIDADES	Peso_Ø8.00	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCRAMP		CISCEA_QUANTIDADES	Peso_Ø10.00	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCRAMP		CISCEA_QUANTIDADES	Peso_Ø12.50	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCRAMP		CISCEA_QUANTIDADES	Peso_Ø16.00	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCRAMP		CISCEA_QUANTIDADES	Peso_Ø20.00	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCRAMP		CISCEA_QUANTIDADES	Peso_Ø25.00	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCFOOTING		CISCEA_IDENTIFICAÇÃO	Concreto fck	IfcLabel	required				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCFOOTING		CISCEA_QUANTIDADES	Volume de Concreto	IfcVolumeMeasure	required				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCFOOTING		CISCEA_QUANTIDADES	Área de Fôrma	IfcAreaMeasure	required				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCFOOTING		CISCEA_QUANTIDADES	Peso_Ø5.00	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCFOOTING		CISCEA_QUANTIDADES	Peso_Ø6.30	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCFOOTING		CISCEA_QUANTIDADES	Peso_Ø8.00	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCFOOTING		CISCEA_QUANTIDADES	Peso_Ø10.00	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCFOOTING		CISCEA_QUANTIDADES	Peso_Ø12.50	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCFOOTING		CISCEA_QUANTIDADES	Peso_Ø16.00	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCFOOTING		CISCEA_QUANTIDADES	Peso_Ø20.00	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCFOOTING		CISCEA_QUANTIDADES	Peso_Ø25.00	IfcMassMeasure	optional				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCPILE		CISCEA_IDENTIFICAÇÃO	Descrição	IfcLabel	required				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCPILE		CISCEA_QUANTIDADES	Comprimento do furo	IfcLengthMeasure	required				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCSLAB		CISCEA_IDENTIFICAÇÃO	Descrição	IfcLabel	required				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCSLAB		CISCEA_QUANTIDADES	Volume	IfcVolumeMeasure	required				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCWALL	SOLIDWALL	CISCEA_IDENTIFICAÇÃO	Descrição	IfcLabel	required				
+ESTRUTURA DE CONCONCRETO	propriedades necessárias para a estrutura de concreto	IFCWALL	SOLIDWALL	CISCEA_QUANTIDADES	Área	IfcAreaMeasure	required				
