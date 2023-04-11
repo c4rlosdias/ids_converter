@@ -121,7 +121,7 @@ if uploaded_file is not None:
      
 
 else:
-    st.image('./resources/img/ids-logo.PNG', width=100)
+    st.image('./resources/img/ids-logo.png', width=100)
     st.markdown('™️')
     st.header("IDS Converter")
     st.write('_By Carlos Dias_')
