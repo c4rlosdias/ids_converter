@@ -37,7 +37,7 @@ with st.sidebar:
     st.divider()
     uploaded_file = st.file_uploader("📥 Choose a CSV file", type=['csv'])
     st.divider()
-    st.image('./resources/img/github-logo.PNG', width=50)    
+    st.image('./resources/img/github-logo.png', width=50)    
     st.write('https://github.com/c4rlosdias/ids_converter')
     
 
