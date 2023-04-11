@@ -19,12 +19,11 @@ dic = {'specification name' : ['specifiation 01', 'specification 01', 'specifica
        'specification instructions' : ['instructions 01', 'istructions 01', 'instructions 02'],
        'entity' : ['IFCWALL', 'IFCWALL', 'IFCDOOR'],
        'predefined type' : ['WALLSTANDARDCASE', 'WALLSTANDARDCASE', 'DOORSTANDARDCASE'],
-       'property' : ['IsExternal', 'IsBearing', 'ssss'],       
+       'property name' : ['IsExternal', 'IsBearing', 'ssss'],       
        'property type' : ['IFcBoolean', 'IFCBoolean', 'IfcInteger'],
-       'propertyset' : ['Pset_WallCommon', 'Pset_WallCommon', 'Pset_DoorCommom'],
+       'property set' : ['Pset_WallCommon', 'Pset_WallCommon', 'Pset_DoorCommom'],
        'property value' : ['True', 'True', '40'],
-       'minOccurs' : [0 , 0, 0],
-       'maxOccurs' : ['UnBounded','UnBounded', 'UnBounded' ]
+       'optionality' : ['Required','Optional', 'Prohibited' ]
        }
 
 df_sample = pd.DataFrame(dic)
@@ -74,7 +73,8 @@ if uploaded_file is not None:
             st.write(frame[['property name',
                             'property type',
                             'property set',
-                            'property value']]
+                            'property value',
+                            'optionality']]
             )
 
         st.divider()
@@ -99,8 +99,11 @@ if uploaded_file is not None:
                         name=row['property name'],
                         value=None if row['property value']=='' else row['property value'],
                         propertySet=row['property set'],
-                        measure=row['property type']
+                        measure=row['property type'],
+                        minOccurs=0 if row['optionality'] in ['Optional', 'Prohibited'] else 1,
+                        maxOccurs='unbounded' if row['optionality'] in ['Required', 'Optional'] else 0 
                     )
+                    
                     my_spec.requirements.append(property)
                 my_ids.specifications.append(my_spec)
            
@@ -116,7 +119,7 @@ else:
     st.header("IDS Converter")
     st.write('_By Carlos Dias_')
     st.divider()
-    st.markdown('IDS Conversor is a file format conversor by :green[CSV file] to :blue[IDS file].')
+    st.markdown('IDS Converter converts a :green[CSV file] to :blue[IDS file].')
     st.markdown('the CSV file needs to have specific columns and in the correct order, as in the example below:')
     st.dataframe(df_sample)
     st.divider()
