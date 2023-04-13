@@ -1,4 +1,5 @@
 import pandas as pd
+import re
 import streamlit as st
 import datetime
 import ifcopenshell
@@ -21,7 +22,8 @@ dic = {'specification name' : ['SPEC_01', 'SPEC_01', 'SPEC_02'],
        'property name' : ['IsExternal', 'LoadBearing', 'GrossArea'],       
        'property type' : ['IFcBoolean', 'IFCBoolean', 'IfcAreaMeasure'],
        'property set' : ['Pset_WallCommon', 'Pset_WallCommon', 'Pset_SlabCommom'],
-       'property value' : ['True', 'True', ''],
+       'property value' : ['True', 'True', '[0-9]'],
+       'restriction' : ['F', 'F', 'T'],
        'optionality' : ['Required','Optional', 'Prohibited' ]
        }
 
@@ -78,6 +80,7 @@ if uploaded_file is not None:
                                 'property type',
                                 'property set',
                                 'property value',
+                                'restriction',
                                 'optionality']]
                 )
 
@@ -102,7 +105,7 @@ if uploaded_file is not None:
                     # insere requisito de propriedade
                     property = ids.Property(
                         name=row['property name'],
-                        value=None if row['property value']=='' else row['property value'],
+                        value=None if row['property value']=='' else ids.Restriction(base="string", options= {'pattern' : row['property value']}) if row['restriction']=='T' else row['property value'],
                         propertySet=row['property set'],
                         measure=row['property type'],
                         minOccurs=0 if row['optionality'].upper() in ['OPTIONAL', 'PROHIBITED'] else 1,
@@ -142,6 +145,7 @@ else:
     st.markdown(':blue[_property type_] -> data type of the requested property (necessary)')
     st.markdown(':blue[_property set_] -> property set name (necessary)')
     st.markdown(':blue[_property value_] -> value requested in the property, when there is one (optional)')
+    st.markdown(':blue[_restriction_] -> if ''T'' then the property value is a regular expression (RegExp) that needs to be matched by the property value')
     st.markdown(':blue[_optionality_] -> property optionality, which can be :green[Required], :green[Optional], '+
                 ' or :green[Prohibited] (necessary)')
     st.markdown('Example:')
