@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import re
 import streamlit as st
 import datetime
@@ -15,29 +16,29 @@ st.set_page_config(
 if True not in st.session_state:
     st.session_state.disabled = False
 
-dic = {'specification name' : ['SPEC_01', 'SPEC_01', 'SPEC_02'],
+dic = {'specification name' : ['My_spec_01', 'My_spec_01', 'My_spec_02'],
        'specification description' : ['Walls needs this properties', 'Walls needs this properties', 'Slabs needs area'],
        'entity' : ['IFCWALL', 'IFCWALL', 'IFCSLAB'],
        'predefined type' : ['STANDARD', 'STANDARD', 'FLOOR'],
        'property name' : ['IsExternal', 'LoadBearing', 'GrossArea'],       
-       'property type' : ['IFcBoolean', 'IFCBoolean', 'IfcAreaMeasure'],
+       'property type' : ['IFcBoolean', 'IfcBoolean', 'IfcAreaMeasure'],
        'property set' : ['Pset_WallCommon', 'Pset_WallCommon', 'Pset_SlabCommom'],
        'property value' : ['True', 'True', '[0-9]'],
-       'restriction' : ['F', 'F', 'T'],
-       'optionality' : ['Required','Optional', 'Prohibited' ]
+       'have restriction' : ['False', 'False', 'True'],
+       'optionality' : ['required','optional', 'required' ]
        }
 
 df_sample = pd.DataFrame(dic)
 df_sample.set_index('specification name')
-dic_sep = { 'TAB' : '\t',',' : ',', ';' : ';'}
 
 with st.sidebar:
     st.title('IDS Converter')
     st.image('./resources/img/LOGO 1X1_2.PNG', width=150)
     st.write('_By Carlos Dias_')
-    sep = st.selectbox('Choose separator:',('TAB', ',', ';'))
+    uploaded_file = st.file_uploader("📥 Choose a XLSX file", type=['xlsx'])
+
     st.divider()
-    uploaded_file = st.file_uploader("📥 Choose a CSV file", type=['csv'])
+    
     st.divider()
     st.image('./resources/img/github-logo.png', width=50)    
     st.write('https://github.com/c4rlosdias/ids_converter')
@@ -66,7 +67,9 @@ if uploaded_file is not None:
 
     with st.container():
         st.markdown(':white_check_mark: :green[check your specifications:]')
-        df = pd.read_csv(uploaded_file, sep=dic_sep[sep], keep_default_na=False)
+        # Cria o DataFrame
+        df = pd.read_excel(uploaded_file, dtype= str)
+        df = df.fillna('')
         df_group = df.groupby(['specification name', 'specification description','entity', 'predefinedType'])
 
         for spec, frame in df_group:
@@ -80,7 +83,8 @@ if uploaded_file is not None:
                                 'property type',
                                 'property set',
                                 'property value',
-                                'restriction',
+                                'have restriction',
+                                'restriction base',
                                 'optionality']]
                 )
 
@@ -100,12 +104,17 @@ if uploaded_file is not None:
             )   
             for spec, frame in df_group:
                 my_spec = ids.Specification(name=spec[0], description=spec[1], ifcVersion=ifc_version)
-                my_spec.applicability.append(ids.Entity(name=spec[2], predefinedType=None if spec[3] == '' else spec[2]))
+                my_spec.applicability.append(ids.Entity(name=spec[2], predefinedType=None if spec[3] == '' else spec[3]))
                 for index, row in frame.iterrows():
                     # insere requisito de propriedade
+                    if row['have restriction'] == 'True' and row['property value'] is not '':
+                        value = ids.Restriction(base=row['restriction base'], options={'pattern' : row['property value']})              
+                    else:
+                        value = None if row['property value'] == '' else row['property value']                                        
+
                     property = ids.Property(
                         name=row['property name'],
-                        value=None if row['property value']=='' else ids.Restriction(base="string", options= {'pattern' : row['property value']}) if row['restriction']=='T' else row['property value'],
+                        value=value,
                         propertySet=row['property set'],
                         measure=row['property type'],
                         minOccurs=0 if row['optionality'].upper() in ['OPTIONAL', 'PROHIBITED'] else 1,
@@ -114,7 +123,7 @@ if uploaded_file is not None:
                     
                     my_spec.requirements.append(property)
                 my_ids.specifications.append(my_spec)
-           
+            
             result = my_ids.to_string()
             if result:
                 st.balloons()
@@ -130,7 +139,7 @@ else:
     st.write('_By Carlos Dias_')
 
     st.markdown('')
-    st.markdown('IDS Converter converts a :green[CSV file] to :blue[IDS file].')
+    st.markdown('IDS Converter converts a :green[Excel file] to :blue[IDS file].')
     st.markdown('IDs is a standard that describes information exchange requirements and has incredible potential. ' +
                 'This converter, however, serves to create an ids with simple specifications, capable of indicating' + 
                 ' which properties and values the model needs to have for each ifc type')
@@ -145,15 +154,18 @@ else:
     st.markdown(':blue[_property type_] -> data type of the requested property (necessary)')
     st.markdown(':blue[_property set_] -> property set name (necessary)')
     st.markdown(':blue[_property value_] -> value requested in the property, when there is one (optional)')
-    st.markdown(':blue[_restriction_] -> if ''T'' then the property value is a regular expression (RegExp) that needs to be matched by the property value')
+    st.markdown(':blue[_have restriction_] -> if ''True'' then the property value is a pattern regular expression (RegExp) that needs to be matched by the property value')
     st.markdown(':blue[_optionality_] -> property optionality, which can be :green[Required], :green[Optional], '+
                 ' or :green[Prohibited] (necessary)')
     st.markdown('Example:')
     st.dataframe(df_sample)
     st.markdown('⚠️ Note that the same specification can occupy more than one row of the table!')
+    st.markdown('')
+    with open("./sample/IDS_SAMPLE.xlsx", "rb") as file:
+        st.download_button('💾 Click here to download the template file!', data=file, file_name="IDS_TEMPLATE.xlsx")
     st.divider()
 
-    st.markdown('☑️ Now, use the sidebar to upload your CSV file! 👊')
+    st.markdown('☑️ Now, use the sidebar to upload your XLSX file! 👊')
     
 
 
