@@ -1,6 +1,5 @@
 import pandas as pd
-import numpy as np
-import re
+import requests
 import streamlit as st
 import datetime
 import ifcopenshell
@@ -13,8 +12,8 @@ st.set_page_config(
      initial_sidebar_state="expanded",
 )
 
-if True not in st.session_state:
-    st.session_state.disabled = False
+if 'bsdd_loaded' not in st.session_state:
+    st.session_state.bsdd_loaded = False
 
 dic = {'specification name'        : ['My_spec_01', 'My_spec_01', 'My_spec_02'],
        'specification description' : ['Walls needs this properties', 'Walls needs this properties', 'Slabs needs area'],
@@ -26,7 +25,7 @@ dic = {'specification name'        : ['My_spec_01', 'My_spec_01', 'My_spec_02'],
        'property value'            : ['True', 'True', '[0-9]'],
        'have restriction'          : ['False', 'False', 'True'],
        'restriction base'          : ['string', 'string', 'string'],
-       'optionality'               : ['required','optional', 'required' ]
+       'optionality'               : ['required','optional', 'required']
        }
 
 df_sample = pd.DataFrame(dic)
@@ -37,10 +36,26 @@ with st.sidebar:
     st.image('./resources/img/LOGO 1X1_2.PNG', width=150)
     uploaded_file = st.file_uploader("📥 Choose a XLSX file", type=['xlsx'])
     st.divider()
+    bsdd = st.button('Connect to bSDD')
+    if bsdd:
+        st.session_state.bsdd_loaded = True
+    if st.session_state.bsdd_loaded:
+        response = requests.get('https://test.bsdd.buildingsmart.org/api/Domain/v3')
+        if response.status_code == 200:
+            domains = []
+            for domain in response.json():
+                domains.append(domain["name"])
+
+            domain = st.selectbox('Select domain', domains)
+            
+
+    st.divider()
     st.image('./resources/img/github-logo.png', width=50)    
     st.write('https://github.com/c4rlosdias/ids_converter')
     
-
+#
+# Se foi carregado um arquivo excel para conversão
+#
 if uploaded_file is not None:
 
     with st.container():            
@@ -125,7 +140,12 @@ if uploaded_file is not None:
                 st.balloons()
                 st.download_button('Download IDS file', result, file_name=uploaded_file.name.split('.')[0] + '.ids', mime='xml')
 
-
+#
+# Se foi escolhido um domínio no bSDD
+#
+if st.session_state.bsdd_loaded:
+    with st.container():
+        st.write(domain)
      
 
 else:
