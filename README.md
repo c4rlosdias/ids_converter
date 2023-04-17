@@ -20,7 +20,7 @@ https://idsconverter.herokuapp.com/
 
 For IDS documentation visit: https://github.com/buildingSMART/IDS
 
-
+(IDS Converter uses [Ifcopenshell](http://ifcopenshell.org/))
 
 ## Contact me:
 Carlos Dias <c.dias@carlosdiasopenbim.com>
