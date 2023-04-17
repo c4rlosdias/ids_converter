@@ -9,12 +9,16 @@ Of course, the IDS standard goes much further than that, providing an incredible
 
 Still in Beta version, for testing purposes, this app is open for use by anyone who wants to collaborate with the project.
 
+## Try it:
+https://idsconverter.herokuapp.com/
 
 ## TODO:
 - [ ] include other types of restrictions accepted by the IDS;
 - [ ] include import of properties defined in bSDD;
 
 For IDS documentation visit: https://github.com/buildingSMART/IDS
+
+
 
 ## Contact me:
 Carlos Dias <c.dias@carlosdiasopenbim.com>
