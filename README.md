@@ -9,7 +9,7 @@ Of course, the IDS standard goes much further than that, providing an incredible
 
 Still in Beta version, for testing purposes, this app is open for use by anyone who wants to collaborate with the project.
 
-## Try it:
+## Try on:
 https://idsconverter.herokuapp.com/
 
 ## TODO:
