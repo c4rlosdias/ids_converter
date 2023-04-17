@@ -13,8 +13,10 @@ Still in Beta version, for testing purposes, this app is open for use by anyone 
 https://idsconverter.herokuapp.com/
 
 ## TODO:
-- [ ] include other types of restrictions accepted by the IDS;
-- [ ] include import of properties defined in bSDD;
+- [ ] Include other types of restrictions accepted by the IDS;
+- [ ] Connection with bSDD;
+- [ ] Add a IDS validator
+- [ ] Add a BCF creator
 
 For IDS documentation visit: https://github.com/buildingSMART/IDS
 
