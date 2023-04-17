@@ -145,7 +145,7 @@ else:
                 ' which properties and values the model needs to have for each ifc type')
     
     st.divider()
-    st.markdown('the CSV file needs to have specific columns described bellow:')
+    st.markdown('the Excel file needs to have specific columns described bellow:')
     st.markdown(':blue[_specification name_] -> Specification name or code (necessary)')
     st.markdown(':blue[_specification description_] -> Specification description (optional)')
     st.markdown(':blue[_entity_] -> ifc type of the elements to be checked (necessary)')
