@@ -5,6 +5,16 @@ import datetime
 import ifcopenshell
 from modules.ifctester import ids
 
+def search_json(search, value, json):
+    result = None
+    for e in json:
+        if e['name'] == search:
+            result = e[value]
+    return result
+    
+
+
+
 st.set_page_config(
      page_title="IDS Converter",
      page_icon="🔄",
@@ -45,9 +55,10 @@ with st.sidebar:
             domains = []
             for domain in response.json():
                 domains.append(domain["name"])
-
+                
             domain = st.selectbox('Select domain', domains)
-            
+
+    play = st.button('play')       
 
     st.divider()
     st.image('./resources/img/github-logo.png', width=50)    
@@ -143,9 +154,34 @@ if uploaded_file is not None:
 #
 # Se foi escolhido um domínio no bSDD
 #
-if st.session_state.bsdd_loaded:
+if st.session_state.bsdd_loaded and play:
     with st.container():
-        st.write(domain)
+        domain_namespace = search_json(domain, 'namespaceUri',response.json())
+        params = {'namespaceUri' : domain_namespace}
+        response = requests.get('https://test.bsdd.buildingsmart.org/api/Domain/v3/classifications', params=params)
+        classifications = response.json()['classifications']
+        for classification in classifications:
+            class_namespace = classification['namespaceUri']
+            class_name = classification['name']
+            params2 = {'namespaceUri' : class_namespace}
+            response2 = requests.get('https://test.bsdd.buildingsmart.org/api/Classification/v4', params=params2)
+            classes = response2.json()
+            if 'classificationProperties' in classes:
+                properties = classes['classificationProperties']
+                l_prop, l_pset, l_class = [], [], []
+                for property in properties:
+                    l_prop.append(property['name'])
+                    l_pset.append(property['propertySet'])
+                    l_class.append(class_name)
+        
+        dic = {'property' : l_prop, 'pset' : l_pset, 'class' : l_class}
+        df=pd.DataFrame(dic)
+        st.write(df)
+
+
+
+
+
      
 
 else:
