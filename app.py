@@ -5,215 +5,295 @@ import datetime
 import ifcopenshell
 from modules.ifctester import ids
 
+# =========================================================================================================================
+# search namespace 
+# =========================================================================================================================
 def search_json(search, value, json):
     result = None
     for e in json:
         if e['name'] == search:
             result = e[value]
     return result
-    
 
+# =========================================================================================================================
+# get bSDD data
+# =========================================================================================================================
+def graphql_search(domain):
+    url = 'https://test.bsdd.buildingsmart.org/graphql/'
+    namespaceUri = search_json(domain, "namespaceUri", response.json())
+
+    query_todo = f'''{{domain(namespaceUri: "{namespaceUri}") {{
+                            name
+                            namespaceUri
+                            classificationSearch {{
+                                code
+                                name
+                                    namespaceUri
+                                    relatedIfcEntityNames
+                                    properties {{
+                                        propertySet
+                                        name
+                                        namespaceUri
+                                        isRequired
+                                        dataType
+                                        pattern
+                                        units
+                                    }}
+                                }}
+                            }}
+                        }}'''
+    payload = {'query': query_todo}
+    r = requests.post(url, json=payload)
+
+    classifications = r.json()['data']['domain']['classificationSearch']
+    l_prop, l_class, l_code, l_desc = [], [], [], []
+    l_entity, l_predefinetype, l_type, l_pset = [], [], [], []
+    l_pvalue, l_haverestriction, l_restrictionbase, l_optionality = [], [], [], []
+
+    for classification in classifications:
+        properties = classification['properties']
+        if len(properties) > 0:
+            for property in properties:
+                l_code.append(classification['code'])
+                l_desc.append(f'The entity {classification["relatedIfcEntityNames"]} needs properties')
+                l_entity.append(classification['relatedIfcEntityNames'])
+                l_predefinetype.append(None)
+                l_prop.append(property['name'])
+                l_type.append(property['dataType'])
+                l_pset.append(property['propertySet'])
+                l_pvalue.append(property['pattern'])
+                l_haverestriction.append(True if property['pattern'] else False)
+                l_restrictionbase.append('string' if property['pattern'] else None)
+                l_optionality.append('required' if property['isRequired'] == True else 'optional')
+                if len(classification['relatedIfcEntityNames']) > 0:
+                    l_class.append(classification['relatedIfcEntityNames'][0])
+                else:
+                    l_class.append(None)
+
+    dic = {'specification name'         : l_code,
+           'specification description'  : l_desc,
+           'property name'              : l_prop,
+           'entity'                     : l_class,
+           'predefined type'             : l_predefinetype,
+           'property name'              : l_prop,
+           'property type'              : l_type,
+           'property set'               : l_pset,
+           'property value'             : l_pvalue,
+           'have restriction'           : l_haverestriction,
+           'restriction base'           : l_restrictionbase,
+           'optionality'                : l_optionality}
+
+    df = pd.DataFrame(dic)
+    return df
 
 
 st.set_page_config(
-     page_title="IDS Converter",
-     page_icon="🔄",
-     layout="wide",
-     initial_sidebar_state="expanded",
+    page_title="IDS Converter",
+    page_icon="🔄",
+    layout="wide",
+    initial_sidebar_state="expanded",
 )
+
+# =========================================================================================================================
+# System vars
+# =========================================================================================================================
+
+if 'mode' not in st.session_state:
+    st.session_state.mode = None
+
+if 'df' not in st.session_state:
+    st.session_state.df = None
+
+if 'file_name' not in st.session_state:
+    st.session_state.file_name = None
 
 if 'bsdd_loaded' not in st.session_state:
     st.session_state.bsdd_loaded = False
 
-dic = {'specification name'        : ['My_spec_01', 'My_spec_01', 'My_spec_02'],
-       'specification description' : ['Walls needs this properties', 'Walls needs this properties', 'Slabs needs area'],
-       'entity'                    : ['IFCWALL', 'IFCWALL', 'IFCSLAB'],
-       'predefined type'           : ['STANDARD', 'STANDARD', 'FLOOR'],
-       'property name'             : ['IsExternal', 'LoadBearing', 'GrossArea'],       
-       'property type'             : ['IFcBoolean', 'IfcBoolean', 'IfcAreaMeasure'],
-       'property set'              : ['Pset_WallCommon', 'Pset_WallCommon', 'Pset_SlabCommom'],
-       'property value'            : ['True', 'True', '[0-9]'],
-       'have restriction'          : ['False', 'False', 'True'],
-       'restriction base'          : ['string', 'string', 'string'],
-       'optionality'               : ['required','optional', 'required']
+
+dic = {'specification name'       : ['My_spec_01', 'My_spec_01', 'My_spec_02'],
+       'specification description': ['Walls needs this properties', 'Walls needs this properties', 'Slabs needs area'],
+       'entity'                   : ['IFCWALL', 'IFCWALL', 'IFCSLAB'],
+       'predefined type'          : ['STANDARD', 'STANDARD', 'FLOOR'],
+       'property name'            : ['IsExternal', 'LoadBearing', 'GrossArea'],
+       'property type'            : ['IFcBoolean', 'IfcBoolean', 'IfcAreaMeasure'],
+       'property set'             : ['Pset_WallCommon', 'Pset_WallCommon', 'Pset_SlabCommom'],
+       'property value'           : ['True', 'True', '[0-9]'],
+       'have restriction'         : ['False', 'False', 'True'],
+       'restriction base'         : ['string', 'string', 'string'],
+       'optionality'              : ['required', 'optional', 'required']
        }
 
 df_sample = pd.DataFrame(dic)
 df_sample.set_index('specification name')
 
+# =========================================================================================================================
+# Sidebar
+# =========================================================================================================================
+
 with st.sidebar:
+    
     st.title('IDS Converter')
     st.image('./resources/img/LOGO 1X1_2.PNG', width=150)
-    uploaded_file = st.file_uploader("📥 Choose a XLSX file", type=['xlsx'])
+    uploaded_file = st.file_uploader("📥 Choose a XLSX file", type=['xlsx'] )
+    if uploaded_file is not None:
+        st.session_state.mode='file'
     st.divider()
-    bsdd = st.button('Connect to bSDD')
-    if bsdd:
+
+    submit = st.button('Connect to bSDD')
+    if submit:
         st.session_state.bsdd_loaded = True
+
     if st.session_state.bsdd_loaded:
         response = requests.get('https://test.bsdd.buildingsmart.org/api/Domain/v3')
         if response.status_code == 200:
             domains = []
             for domain in response.json():
                 domains.append(domain["name"])
-                
+
             domain = st.selectbox('Select domain', domains)
-
-    play = st.button('play')       
+            loaded = st.button('Load domain')
+            if loaded:
+                st.session_state.mode = 'bsdd'                      
 
     st.divider()
-    st.image('./resources/img/github-logo.png', width=50)    
+    st.image('./resources/img/github-logo.png', width=50)
     st.write('https://github.com/c4rlosdias/ids_converter')
-    
-#
-# Se foi carregado um arquivo excel para conversão
-#
-if uploaded_file is not None:
 
-    with st.container():            
-        st.header('IDS Information')
-        col1, col2 = st.columns(2, gap="large")
-        with col1:
-            title       = st.text_input('_Title:_')
-            copyright   = st.text_input('_Copyright:_')
-            version     = st.text_input('_Version:_')
-            author      = st.text_input('_Author:_', 'xxxxx@xxxxx.xxx')
-            ifc_version = st.selectbox('_IFC Version:_', ('IFC2X3', 'IFC4', 'IFC4X3'))
-                        
-        with col2:
-            date        = st.text_input('_Date:_', datetime.date.today())
-            description = st.text_input('_Description:_')
-            purpose     = st.text_input('_Purpose:_')
-            milestone   = st.text_input('_Milestone:_')
-    
-    st.divider()
-    st.write(ifc_version)
+# =========================================================================================================================
+# If file loaded or bSDD connection
+# =========================================================================================================================
+
+if st.session_state.mode is not None:
 
     with st.container():
-        st.markdown(':white_check_mark: :green[check your specifications:]')
-        # Cria o DataFrame
-        df = pd.read_excel(uploaded_file, dtype= str)
-        df = df.fillna('')
-        df_group = df.groupby(['specification name', 'specification description','entity', 'predefinedType'])
 
-        for spec, frame in df_group:            
-            with st.expander(':green[Specification Name :]' + spec[0]):
-                st.markdown(f':green[Description:]{spec[1]}')
-                st.markdown('**APPLICABILITY:**')
-                st.write(f':green[Entity :]{spec[2]} - ', f':green[PredefinedType :]{spec[3]}')
-                st.markdown('**REQUIREMENTS:**')
-                st.write(frame[['property name',
-                                'property type',
-                                'property set',
-                                'property value',
-                                'have restriction',
-                                'restriction base',
-                                'optionality']]
-                )
+        # Create Dataframe
 
-        st.divider()
+        if st.session_state.mode == 'bsdd':            
+            st.session_state.df = graphql_search(domain)
+            st.session_state.file_name= domain + '.ids' 
 
-        # Conversao
-        submitted = st.button("Convert to IDS ▶️")    
-        if submitted:
-            my_ids= ids.Ids(title=title, 
-                            copyright=copyright, 
-                            version=version, 
-                            author=author, 
-                            description=description, 
-                            date=date,
-                            purpose=purpose, 
-                            milestone=milestone
-            )   
-            for spec, frame in df_group:
-                my_spec = ids.Specification(name=spec[0], description=spec[1], ifcVersion=ifc_version)
-                my_spec.applicability.append(ids.Entity(name=spec[2], predefinedType=None if spec[3] == '' else spec[3]))
-                for index, row in frame.iterrows():
-                    # insere requisito de propriedade
-                    if row['have restriction'] == 'True' and row['property value'] is not '':
-                        value = ids.Restriction(base=row['restriction base'], options={'pattern' : row['property value']})              
-                    else:
-                        value = None if row['property value'] == '' else row['property value']                                        
-
-                    property = ids.Property(
-                        name=row['property name'],
-                        value=value,
-                        propertySet=row['property set'],
-                        measure=row['property type'],
-                        minOccurs=0 if row['optionality'].upper() in ['OPTIONAL', 'PROHIBITED'] else 1,
-                        maxOccurs='unbounded' if row['optionality'].upper() in ['REQUIRED', 'OPTIONAL'] else 0 
-                    )
-                    
-                    my_spec.requirements.append(property)
-                my_ids.specifications.append(my_spec)
+        if st.session_state.mode == 'file':           
+            st.session_state.df = pd.read_excel(uploaded_file, dtype=str)
+            st.session_state.file_name=uploaded_file.name.split('.')[0] + '.ids'
             
-            result = my_ids.to_string()
-            if result:
-                st.balloons()
-                st.download_button('Download IDS file', result, file_name=uploaded_file.name.split('.')[0] + '.ids', mime='xml')
 
-#
-# Se foi escolhido um domínio no bSDD
-#
-if st.session_state.bsdd_loaded and play:
-    with st.container():
-        domain_namespace = search_json(domain, 'namespaceUri',response.json())
-        params = {'namespaceUri' : domain_namespace}
-        response = requests.get('https://test.bsdd.buildingsmart.org/api/Domain/v3/classifications', params=params)
-        classifications = response.json()['classifications']
-        for classification in classifications:
-            class_namespace = classification['namespaceUri']
-            class_name = classification['name']
-            params2 = {'namespaceUri' : class_namespace}
-            response2 = requests.get('https://test.bsdd.buildingsmart.org/api/Classification/v4', params=params2)
-            classes = response2.json()
-            if 'classificationProperties' in classes:
-                properties = classes['classificationProperties']
-                l_prop, l_pset, l_class = [], [], []
-                for property in properties:
-                    l_prop.append(property['name'])
-                    l_pset.append(property['propertySet'])
-                    l_class.append(class_name)
         
-        dic = {'property' : l_prop, 'pset' : l_pset, 'class' : l_class}
-        df=pd.DataFrame(dic)
-        st.write(df)
+        if st.session_state.df is not None:
 
+            st.header('IDS Information')
+            col1, col2 = st.columns(2, gap="large")
+            with col1:
+                title       = st.text_input('_Title:_')
+                copyright   = st.text_input('_Copyright:_')
+                version     = st.text_input('_Version:_')
+                author      = st.text_input('_Author:_', 'xxxxx@xxxxx.xxx')
+                ifc_version = st.selectbox('_IFC Version:_', ('IFC2X3', 'IFC4', 'IFC4X3'))
 
+            with col2:
+                date        = st.text_input('_Date:_', datetime.date.today())
+                description = st.text_input('_Description:_')
+                purpose     = st.text_input('_Purpose:_')
+                milestone   = st.text_input('_Milestone:_')
 
+            st.divider()
 
+            st.markdown(':white_check_mark: :green[check your specifications:]')
 
-     
+            df = st.session_state.df.fillna('')
+            df_group = df.groupby(['specification name', 'specification description', 'entity', 'predefined type'])
 
+            for spec, frame in df_group:
+                with st.expander(':green[Specification Name :]' + spec[0]):
+                    st.markdown(f':green[Description:]{spec[1]}')
+                    st.markdown('**APPLICABILITY:**')
+                    st.write(f':green[Entity :]{spec[2]} - ',
+                            f':green[Predefined Type :]{spec[3]}')
+                    st.markdown('**REQUIREMENTS:**')
+                    st.write(frame[['property name',
+                                    'property type',
+                                    'property set',
+                                    'property value',
+                                    'have restriction',
+                                    'restriction base',
+                                    'optionality']]
+                    )
+
+            st.divider()
+
+            #
+            # Convert dataframe to ids
+            #
+            submitted = st.button("Convert to IDS ▶️")
+            if submitted:
+                my_ids = ids.Ids(title=title,
+                                copyright=copyright,
+                                version=version,
+                                author=author,
+                                description=description,
+                                date=date,
+                                purpose=purpose,
+                                milestone=milestone
+                                )
+                for spec, frame in df_group:
+                    my_spec = ids.Specification(name=spec[0], description=spec[1], ifcVersion=ifc_version)
+                    my_spec.applicability.append(ids.Entity(name=spec[2], predefinedType=None if spec[3] == '' else spec[3]))
+                    for index, row in frame.iterrows():
+                        # add property requirement
+                        if row['have restriction'] == 'True' and row['property value'] is not '':
+                            value = ids.Restriction(base=row['restriction base'], options={'pattern': row['property value']})
+                        else:
+                            value = None if row['property value'] == '' else row['property value']
+                        property = ids.Property(
+                            name=row['property name'],
+                            value=value,
+                            propertySet=row['property set'],
+                            measure=row['property type'],
+                            minOccurs=0 if row['optionality'].upper() in ['OPTIONAL', 'PROHIBITED'] else 1,
+                            maxOccurs='unbounded' if row['optionality'].upper() in ['REQUIRED', 'OPTIONAL'] else 0
+                        )
+
+                        my_spec.requirements.append(property)
+                        my_ids.specifications.append(my_spec)
+
+                result = my_ids.to_string()
+
+                if result:
+                    st.balloons()
+                    st.download_button('Download IDS file', result, file_name=st.session_state.file_name, mime='xml')
+
+                else:
+                    st.error('ERRO : File not created!')
+
+# =========================================================================================================================
+# Introduction screen
+# =========================================================================================================================
 else:
     st.image('./resources/img/ids-logo.png', width=100)
     st.markdown('™️')
     st.header("IDS Converter")
     st.write('_By Carlos Dias_')
-
     st.markdown('')
     st.markdown('IDS Converter converts a :green[Excel file] to :blue[IDS file].')
     st.markdown('IDs is a standard that describes information exchange requirements and has incredible potential. ' +
-                'This converter, however, serves to create an ids with simple specifications, capable of indicating' + 
+                'This converter, however, serves to create an ids with simple specifications, capable of indicating' +
                 ' which properties and values the model needs to have for each ifc type')
     st.markdown('')
     st.markdown('_IDS Converter uses [IfcOpenShell](http://ifcopenshell.org/)_')
-    
     st.divider()
-    
     st.markdown('the Excel file needs to have specific columns described bellow:')
     st.markdown(':blue[_specification name_]        : Specification name or code (necessary)')
     st.markdown(':blue[_specification description_] : Specification description (optional)')
     st.markdown(':blue[_entity_]                    : ifc type of the elements to be checked (necessary)')
-    st.markdown(':blue[_predefinedType_]            : predefined type of the elements to be checked (optional)')
+    st.markdown(':blue[_predefined type_]            : predefined type of the elements to be checked (optional)')
     st.markdown(':blue[_property name_]             : requested property name (necessary)')
     st.markdown(':blue[_property type_]             : data type of the requested property (necessary)')
     st.markdown(':blue[_property set_]              : property set name (necessary)')
     st.markdown(':blue[_property value_]            : value requested in the property, when there is one (optional)')
     st.markdown(':blue[_have restriction_]          : if ''True'' then the property value is a pattern regular expression (RegExp) that needs to be matched by the property value (optional)')
     st.markdown(':blue[_restriction base_]          : data type of property value on restriction (optional)')
-    st.markdown(':blue[_optionality_]               : property optionality, which can be :green[Required], :green[Optional], '+
-                ' or :green[Prohibited] (necessary)')
- 
+    st.markdown(':blue[_optionality_]               : property optionality, which can be :green[Required], :green[Optional], or :green[Prohibited] (necessary)')
     st.markdown('Example:')
     st.dataframe(df_sample)
     st.markdown('⚠️ Note that the same specification can occupy more than one row of the table!')
@@ -223,7 +303,3 @@ else:
     st.divider()
 
     st.markdown('☑️ Now, use the sidebar to upload your XLSX file! 👊')
-    
-
-
-    
