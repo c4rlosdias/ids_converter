@@ -14,7 +14,7 @@ https://idsconverter.herokuapp.com/
 
 ## TODO:
 - [ ] Include other types of restrictions accepted by the IDS;
-- [ ] Connection with bSDD;
+- [X] Connection with bSDD;
 - [ ] Add a IDS validator
 - [ ] Add a BCF creator
 
