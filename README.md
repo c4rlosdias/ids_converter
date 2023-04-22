@@ -9,6 +9,8 @@ Of course, the IDS standard goes much further than that, providing an incredible
 
 Still in Beta version, for testing purposes, this app is open for use by anyone who wants to collaborate with the project.
 
+(IDS Converter uses [Ifcopenshell](http://ifcopenshell.org/))
+
 ## Try on:
 https://idsconverter.herokuapp.com/
 
@@ -19,8 +21,6 @@ https://idsconverter.herokuapp.com/
 - [ ] Add a BCF creator
 
 For IDS documentation visit: https://github.com/buildingSMART/IDS
-
-(IDS Converter uses [Ifcopenshell](http://ifcopenshell.org/))
 
 ## Contact me:
 Carlos Dias <c.dias@carlosdiasopenbim.com>
