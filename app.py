@@ -17,6 +17,92 @@ def search_json(search, value, json):
 # =========================================================================================================================
 # get bSDD data
 # =========================================================================================================================
+def properties_search(domain, json):
+    namespaceUri = search_json(domain, "namespaceUri", json)
+    params = {'namespaceUri' : namespaceUri, 'useNestedClassifications' : 'false'}
+    response = requests.get('https://api.bsdd.buildingsmart.org/api/Domain/v3/Classifications', params)
+
+    result = None
+    
+    if response.status_code == 200:
+        l_prop, l_class, l_code, l_desc = [], [], [], []
+        l_predefinetype, l_type, l_pset = [], [], []
+        l_pvalue, l_haverestriction, l_restrictionbase, l_optionality = [], [], [], []
+
+        classifications = response.json()['classifications']
+        progress_text = "Operation in progress. Please wait."
+        my_bar = st.progress(0, text=progress_text)
+        percent_complete = 0
+        increment = 1 / len(classifications)
+        #increment = 1 if increment < 1 else increment
+        for classification in classifications:
+            params2 = {'namespaceUri' : classification['namespaceUri'], 'includeChildClassificationReference' : 'false'}
+            response2 = requests.get('https://api.bsdd.buildingsmart.org/api/Classification/v3', params2)            
+            if response2.status_code == 200:
+                classe = response2.json()
+                if 'classificationProperties' in classe:
+                    class_properties = classe['classificationProperties']
+                    if len(class_properties) > 0:
+                        for property in class_properties:
+                            my_bar.progress(percent_complete if percent_complete < 1 else 1, text=progress_text)                            
+                            l_code.append(classe['referenceCode'])                            
+                            l_predefinetype.append(None)
+                            l_prop.append(property['name'])
+                            l_type.append(property['dataType'])
+                            l_pset.append(property['propertySet'])
+                            l_pvalue.append(property['pattern'] if 'pattern' in property else None)
+                            if 'isRequired' in property:
+                                l_optionality.append('required' if property['isRequired'] == True else 'optional')
+                            else:
+                                l_optionality.append('required')
+
+                            if 'relatedIfcEntityNames' in classe:
+                                l_class.append(classe['relatedIfcEntityNames'][0] if len(classe['relatedIfcEntityNames']) > 0 else None)
+                                l_desc.append(f'The entity {classe["relatedIfcEntityNames"]} needs this properties')
+                            else:
+                                l_class.append('WARNING : NO IFC TYPE DEFINED')
+                                l_desc.append('WARNING : NO IFC TYPE DEFINED')
+                            if 'pattern' in property:
+                                l_haverestriction.append(True if property['pattern'] else False)
+                                l_restrictionbase.append('string' if property['pattern'] else None)
+                            else:
+                                l_haverestriction.append(False)
+                                l_restrictionbase.append(None)            
+            else:
+                st.error('ERRO: ' + str(response2.status_code) + ' for classification:' + classification['name'])
+            
+            percent_complete = percent_complete + increment
+
+        my_bar.progress(1, text='Completed!')   
+
+        dic = {'specification name'         : l_code,
+               'specification description'  : l_desc,
+               'property name'              : l_prop,
+               'entity'                     : l_class,
+               'predefined type'            : l_predefinetype,
+               'property name'              : l_prop,
+               'property type'              : l_type,
+               'property set'               : l_pset,
+               'property value'             : l_pvalue,
+               'have restriction'           : l_haverestriction,
+               'restriction base'           : l_restrictionbase,
+               'optionality'                : l_optionality
+        }
+
+        df = pd.DataFrame(dic)
+        result = df    
+
+    else:
+        st.error('ERRO: ' + str(response.status_code) + 'for domain:' + domain)
+
+    return result
+            
+                
+# =========================================================================================================================
+# get bSDD data with graphql - [!] not working in production enviroment
+# =========================================================================================================================
+
+
 def graphql_search(domain):
     url = 'https://test.bsdd.buildingsmart.org/graphql'
     namespaceUri = search_json(domain, "namespaceUri", response.json())
@@ -73,17 +159,18 @@ def graphql_search(domain):
                         l_class.append(None)
 
         dic = {'specification name'         : l_code,
-            'specification description'  : l_desc,
-            'property name'              : l_prop,
-            'entity'                     : l_class,
-            'predefined type'             : l_predefinetype,
-            'property name'              : l_prop,
-            'property type'              : l_type,
-            'property set'               : l_pset,
-            'property value'             : l_pvalue,
-            'have restriction'           : l_haverestriction,
-            'restriction base'           : l_restrictionbase,
-            'optionality'                : l_optionality}
+               'specification description'  : l_desc,
+               'property name'              : l_prop,
+               'entity'                     : l_class,
+               'predefined type'            : l_predefinetype,
+               'property name'              : l_prop,
+               'property type'              : l_type,
+               'property set'               : l_pset,
+               'property value'             : l_pvalue,
+               'have restriction'           : l_haverestriction,
+               'restriction base'           : l_restrictionbase,
+               'optionality'                : l_optionality
+        }
 
         df = pd.DataFrame(dic)
         result = df
@@ -116,6 +203,9 @@ if 'file_name' not in st.session_state:
 
 if 'bsdd_loaded' not in st.session_state:
     st.session_state.bsdd_loaded = False
+
+if 'bsdd_done' not in st.session_state:
+    st.session_state.bsdd_done = False
 
 
 dic = {'specification name'       : ['My_spec_01', 'My_spec_01', 'My_spec_02'],
@@ -150,7 +240,7 @@ with st.sidebar:
     submit = st.button('Connect to bSDD')
     if submit:
         st.session_state.bsdd_loaded = True
-
+        
     if st.session_state.bsdd_loaded:
         response = requests.get('https://api.bsdd.buildingsmart.org/api/Domain/v3')
         if response.status_code == 200:
@@ -161,7 +251,8 @@ with st.sidebar:
             domain = st.selectbox('Select domain', domains)
             loaded = st.button('Load domain')
             if loaded:
-                st.session_state.mode = 'bsdd'                      
+                st.session_state.mode = 'bsdd'
+                st.session_state.bsdd_done = False                   
 
     st.divider()
     st.image('./resources/img/github-logo.png', width=50)
@@ -178,8 +269,9 @@ if st.session_state.mode is not None:
         # Create Dataframe
 
         if st.session_state.mode == 'bsdd':            
-            st.session_state.df = graphql_search(domain)
-            st.session_state.file_name= domain + '.ids' 
+            st.session_state.df = properties_search(domain, response.json()) if not st.session_state.bsdd_done  else st.session_state.df
+            st.session_state.file_name = domain + '.ids' 
+            st.session_state.bsdd_done = True
 
         if st.session_state.mode == 'file':           
             st.session_state.df = pd.read_excel(uploaded_file, dtype=str)
