@@ -73,7 +73,7 @@ def properties_search(domain, json):
             
             percent_complete = percent_complete + increment
 
-        my_bar.progress(1, text='Completed!')   
+        my_bar.progress(100, text='Completed!')   
 
         dic = {'specification name'         : l_code,
                'specification description'  : l_desc,
