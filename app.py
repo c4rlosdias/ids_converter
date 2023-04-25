@@ -3,6 +3,7 @@ import requests
 import streamlit as st
 import datetime
 from modules.ifctester import ids
+from PIL import Image
 
 # =========================================================================================================================
 # search namespace 
@@ -47,9 +48,9 @@ def properties_search(domain, json):
                             my_bar.progress(percent_complete if percent_complete < 1 else 1, text=progress_text)                            
                             l_code.append(classe['referenceCode'])                            
                             l_predefinetype.append(None)
-                            l_prop.append(property['name'])
-                            l_type.append(property['dataType'])
-                            l_pset.append(property['propertySet'])
+                            l_prop.append(property['name'] if 'name' in property else None)
+                            l_type.append(property['dataType'] if 'dataType' in property else None)
+                            l_pset.append(property['propertySet'] if 'propertySet' in property else None)
                             l_pvalue.append(property['pattern'] if 'pattern' in property else None)
                             if 'isRequired' in property:
                                 l_optionality.append('required' if property['isRequired'] == True else 'optional')
@@ -104,7 +105,7 @@ def properties_search(domain, json):
 
 
 def graphql_search(domain):
-    url = 'https://test.bsdd.buildingsmart.org/graphql'
+    url = 'https://api.bsdd.buildingsmart.org/graphql'
     namespaceUri = search_json(domain, "namespaceUri", response.json())
     query_todo = f'''{{domain(namespaceUri: "{namespaceUri}") {{
                             name
@@ -128,7 +129,7 @@ def graphql_search(domain):
                     }}'''
 
     payload = {'query': query_todo}
-    r = requests.post(url, json=payload)
+    r = requests.post(url, json= payload)
     st.write(r.status_code)
 
     if r.status_code == 200:
@@ -180,10 +181,14 @@ def graphql_search(domain):
 
     return result
 
+# =========================================================================================================================
+# page config
+# =========================================================================================================================
 
+im = Image.open('./resources/img/IDS_logo.ico')
 st.set_page_config(
     page_title="IDS Converter",
-    page_icon="🔄",
+    page_icon=im,
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -270,6 +275,7 @@ if st.session_state.mode is not None:
 
         if st.session_state.mode == 'bsdd':            
             st.session_state.df = properties_search(domain, response.json()) if not st.session_state.bsdd_done  else st.session_state.df
+            #st.session_state.df = graphql_search(domain) if not st.session_state.bsdd_done  else st.session_state.df
             st.session_state.file_name = domain + '.ids' 
             st.session_state.bsdd_done = True
 
@@ -340,7 +346,7 @@ if st.session_state.mode is not None:
                     my_spec.applicability.append(ids.Entity(name=spec[2], predefinedType=None if spec[3] == '' else spec[3]))
                     for index, row in frame.iterrows():
                         # add property requirement
-                        if row['have restriction'] == 'True' and row['property value'] is not '':
+                        if row['have restriction'] == 'True' and row['property value'] != '':
                             value = ids.Restriction(base=row['restriction base'], options={'pattern': row['property value']})
                         else:
                             value = None if row['property value'] == '' else row['property value']
