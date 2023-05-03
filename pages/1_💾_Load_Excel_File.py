@@ -43,8 +43,7 @@ with st.sidebar:
 
     uploaded_file = st.file_uploader("📥 Choose a XLSX file", type=['xlsx'])       
 
-
-    
+  
 
 # =========================================================================================================================
 # If file loaded or bSDD connection
