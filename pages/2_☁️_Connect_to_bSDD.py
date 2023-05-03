@@ -287,7 +287,7 @@ if st.session_state.loaded:
             df_group = df.groupby(['specification name', 'specification description', 'entity', 'predefined type'])
 
             for spec, frame in df_group:
-                with st.expander(':green[Specification Name :]' + spec[0]):
+                with st.expander(':green[Specification Name :]' + spec[0] + '-' + spec[2]):
                     st.markdown(f':green[Description:]{spec[1]}')
                     st.markdown('**APPLICABILITY:**')
                     st.write(f':green[Entity :]{spec[2]} - ',
