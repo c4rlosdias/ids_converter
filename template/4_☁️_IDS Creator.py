@@ -201,8 +201,7 @@ st.set_page_config(
 # =========================================================================================================================
 # System vars
 # =========================================================================================================================
-if 'horizontal' not in st.session_state:
-    st.session_state.horizontal = True
+
 
 if 'df' not in st.session_state:
     st.session_state.df = None
@@ -298,21 +297,14 @@ with container_specs:
         options_req = st.multiselect('Choose facets to requirements:', ['Entity', 'Attribute', 'Classification', 'Property', 'Material', 'Parts'], key='req')
         for facet in options_req:
             st.write(f'**{facet}**')
-            cols2 = st.columns(len(facets[facet])+1) 
+            cols2 = st.columns(len(facets[facet]))
             c = 0
             for att in facets[facet]:
-                if att == 'Value':
-                    with cols2[c]:
-                        op = st.radio(':green[Value Type]', ['Simple Value','Pattern restriction', 'Enumeration restriction'], key='req' + facet + att, horizontal=st.session_state.horizontal)
-                    with cols2[c+1]:
-                        if op == 'Enumeration restriction':
-                            df_enum = pd.DataFrame([{'enumeration' : ''}])
-                            df_enum_edited = st.experimental_data_editor(df_enum, num_rows="dynamic")
-                            st.write(df_enum_edited)
-                        else:
-                            st.text_input(op, key='breq' + facet + att)
-                else:
-                    with cols2[c]:
+                with cols2[c]:
+                    if att == 'Value':
+                        op = st.radio(':green[Value]', ['Simple Value','Pattern restriction', 'Enumeration restriction'], key='req' + facet + att, horizontal=True)
+                        st.text_input(op, key='breq' + facet + att)
+                    else:
                         st.text_input(f':green[{att}]', key='req' + facet + att)
                 c += 1
 
