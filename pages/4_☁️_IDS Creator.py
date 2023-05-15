@@ -265,10 +265,7 @@ with st.container():
 
     st.divider()
 
-    st.markdown(':white_check_mark: :green[Create your specifications:]')
-
-
-container_specs = st.container()
+    
 
 facets = {'Entity'         : ['IFC Class', 'PredefinedType'],
           'Attribute'      : ['Name', 'Value'],
@@ -277,46 +274,63 @@ facets = {'Entity'         : ['IFC Class', 'PredefinedType'],
           'Material'       : ['Value'],
           'Parts'          : ['Entity', 'Relationship']
 }
+st.title(':white_check_mark: :green[Create your specifications:]')
 
-with container_specs:
-    col3, col4 = st.columns(2)
 
-    with col3:
-        st.subheader('**Applicability**')
-        options_app = st.multiselect('Choose the facets to applicability :', ['Entity', 'Attribute', 'Classification', 'Property', 'Material', 'Parts'], key='app')
-        for facet in options_app:
-            st.write(f'**{facet}**')            
-            cols1 = st.columns(len(facets[facet]))
-            c = 0
-            for att in facets[facet]:
-                with cols1[c]:
-                    st.text_input(f':blue[{att}]', key='app' + facet + att)
-                c += 1
+# =========================================================================================================================
+# Specification
+# =========================================================================================================================
 
-    with col4:
-        st.subheader('**Requirements**')
-        options_req = st.multiselect('Choose facets to requirements:', ['Entity', 'Attribute', 'Classification', 'Property', 'Material', 'Parts'], key='req')
-        for facet in options_req:
-            st.write(f'**{facet}**')
-            cols2 = st.columns(len(facets[facet])+1) 
-            c = 0
-            for att in facets[facet]:
-                if att == 'Value':
-                    with cols2[c]:
-                        op = st.radio(':green[Value Type]', ['Simple Value','Pattern restriction', 'Enumeration restriction'], key='req' + facet + att, horizontal=st.session_state.horizontal)
-                    with cols2[c+1]:
-                        if op == 'Enumeration restriction':
-                            df_enum = pd.DataFrame([{'enumeration' : ''}])
-                            df_enum_edited = st.experimental_data_editor(df_enum, num_rows="dynamic")
-                            st.write(df_enum_edited)
-                        else:
-                            st.text_input(op, key='breq' + facet + att)
-                else:
-                    with cols2[c]:
-                        st.text_input(f':green[{att}]', key='req' + facet + att)
-                c += 1
+with st.expander('sssss'):
+    with st.container():
+        col_1, col_2, col_3 = st.columns([1,1,3])
+        with col_1:
+            specification_name = st.text_input('Specification Name :')
+        with col_2:
+            specification_description = st.text_input('Specification Description :')
 
-    st.divider()  
+    with st.container():
+        col3, col4 = st.columns(2)
+
+        with col3:
+            st.subheader('**Applicability**')
+            options_app = st.multiselect('Choose the facets to applicability :', ['Entity', 'Attribute', 'Classification', 'Property', 'Material', 'Parts'], key='app')
+            for facet in options_app:
+                st.write(f'**{facet}**')            
+                cols1 = st.columns(len(facets[facet]))
+                c = 0
+                for att in facets[facet]:
+                    with cols1[c]:
+                        st.text_input(f':blue[{att}]', key='app' + facet + att)
+                    c += 1
+
+        st.divider()
+
+        with col3:
+            st.subheader('**Requirements**')
+            options_req = st.multiselect('Choose facets to requirements:', ['Entity', 'Attribute', 'Classification', 'Property', 'Material', 'Parts'], key='req')
+            for facet in options_req:
+                st.write(f'**{facet}**')
+                cols2 = st.columns(len(facets[facet])+1) 
+                c = 0
+                for att in facets[facet]:
+                    if att == 'Value':
+                        with cols2[c]:
+                            op = st.radio(':green[Value Type]', ['Simple Value','Pattern restriction', 'Enumeration restriction'], key='req' + facet + att, horizontal=st.session_state.horizontal)
+                        with cols2[c+1]:
+                            if op == 'Enumeration restriction':
+                                df_enum = pd.DataFrame([{'enumeration' : ''}])
+                                df_enum_edited = st.experimental_data_editor(df_enum, num_rows="dynamic")
+                            else:
+                                st.text_input(op, key='breq' + facet + att)
+                    else:
+                        with cols2[c]:
+                            st.text_input(f':green[{att}]', key='req' + facet + att)
+                    c += 1
+
+add = st.button('+')
+
+     
 
 
 
