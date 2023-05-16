@@ -274,61 +274,127 @@ facets = {'Entity'         : ['IFC Class', 'PredefinedType'],
           'Material'       : ['Value'],
           'Parts'          : ['Entity', 'Relationship']
 }
-st.title(':white_check_mark: :green[Create your specifications:]')
+
+specification = {'applicability' : {},
+                 'requirements' : {}}
+
+st.header(':white_check_mark: :green[Create your specifications:]')
 
 
 # =========================================================================================================================
 # Specification
 # =========================================================================================================================
 
-with st.expander('sssss'):
-    with st.container():
-        col_1, col_2, col_3 = st.columns([1,1,3])
-        with col_1:
-            specification_name = st.text_input('Specification Name :')
-        with col_2:
-            specification_description = st.text_input('Specification Description :')
 
-    with st.container():
-        col3, col4 = st.columns(2)
+with st.container():
+    col_1, col_2, col_3 = st.columns([1,1,3])
+    with col_1:
+        specification_name = st.text_input('Specification Name :')
+    with col_2:
+        specification_description = st.text_input('Specification Description :')
 
-        with col3:
-            st.subheader('**Applicability**')
-            options_app = st.multiselect('Choose the facets to applicability :', ['Entity', 'Attribute', 'Classification', 'Property', 'Material', 'Parts'], key='app')
-            for facet in options_app:
-                st.write(f'**{facet}**')            
-                cols1 = st.columns(len(facets[facet]))
-                c = 0
-                for att in facets[facet]:
-                    with cols1[c]:
-                        st.text_input(f':blue[{att}]', key='app' + facet + att)
-                    c += 1
+with st.container():
 
-        st.divider()
-
-        with col3:
-            st.subheader('**Requirements**')
-            options_req = st.multiselect('Choose facets to requirements:', ['Entity', 'Attribute', 'Classification', 'Property', 'Material', 'Parts'], key='req')
-            for facet in options_req:
-                st.write(f'**{facet}**')
-                cols2 = st.columns(len(facets[facet])+1) 
-                c = 0
-                for att in facets[facet]:
-                    if att == 'Value':
-                        with cols2[c]:
-                            op = st.radio(':green[Value Type]', ['Simple Value','Pattern restriction', 'Enumeration restriction'], key='req' + facet + att, horizontal=st.session_state.horizontal)
-                        with cols2[c+1]:
-                            if op == 'Enumeration restriction':
-                                df_enum = pd.DataFrame([{'enumeration' : ''}])
-                                df_enum_edited = st.experimental_data_editor(df_enum, num_rows="dynamic")
-                            else:
-                                st.text_input(op, key='breq' + facet + att)
+    # Applicability
+    st.subheader('**Applicability**')
+    options_app = st.multiselect('Choose the facets to applicability :', ['Entity', 'Attribute', 'Classification', 'Property', 'Material', 'Parts'], key='app')
+    for facet in options_app:
+        st.write(f'**{facet}**')            
+        cols1 = st.columns(len(facets[facet]))
+        c = 0
+        for att in facets[facet]:
+            if att == 'Value':
+                with cols1[c]:
+                    op1 = st.radio(':green[Value Type]',
+                                    ['Simple Value','Pattern restriction', 'Enumeration restriction'],
+                                    key='app' + facet + att,
+                                    horizontal=st.session_state.horizontal
+                    )    
+                    if op1 == 'Enumeration restriction':
+                        dfapp_enum = pd.DataFrame([{'enumeration' : ''}])
+                        dfapp_enum_edited = st.experimental_data_editor(dfapp_enum, num_rows="dynamic", use_container_width=200, key='appenum' + facet + att)
                     else:
-                        with cols2[c]:
-                            st.text_input(f':green[{att}]', key='req' + facet + att)
-                    c += 1
+                        specification[facet].append(st.text_input(op1, key='bapp' + facet + att))
+            else:
+                with cols1[c]:
+                    st.text_input(f':green[{att}]', key='app' + facet + att)
 
-add = st.button('+')
+            c += 1
+
+    st.divider()
+
+    # Requirements
+    st.subheader('**Requirements**')
+    options_req = st.multiselect('Choose facets to requirements:', ['Entity', 'Attribute', 'Classification', 'Property', 'Material', 'Parts'], key='req')
+    for facet in options_req:
+        st.write(f'**{facet}**')
+        cols2 = st.columns(len(facets[facet])) 
+        c = 0
+        for att in facets[facet]:
+            if att == 'Value':
+                with cols2[c]:
+                    op2 = st.radio(':green[Value Type]',
+                                   ['Simple Value','Pattern restriction', 'Enumeration restriction'],
+                                   key='req' + facet + att,
+                                   horizontal=st.session_state.horizontal
+                    )
+                    if op2 == 'Enumeration restriction':
+                        dfreq_enum = pd.DataFrame([{'enumeration' : ''}])
+                        dfreq_enum_edited = st.experimental_data_editor(dfreq_enum, num_rows="dynamic", use_container_width=200, key='reqenum' + facet + att)
+                    else:
+                        st.text_input(op2, key='breq' + facet + att)
+            else:
+                with cols2[c]:
+                    st.text_input(f':green[{att}]', key='req' + facet + att)
+            c += 1
+st.divider()
+add = st.button('➕ Add Specification')
+
+if add:
+    my_ids = ids.Ids(title=title,
+                     copyright=copyright,
+                     version=version,
+                     author=author,
+                     description=description,
+                     date=date,
+                     purpose=purpose,
+                     milestone=milestone
+            )
+    
+    my_spec = ids.Specification(name=specification_name, description=specification_description, ifcVersion=ifc_version)
+    app = specification['applicability']
+    if 'Entity' in app:
+        my_spec.applicability.append(ids.Entity(name=app['Entity'][0], predefinedType=app['Entity'][1]))
+    if 'Attribute' in app:
+        my_spec.applicability.append(ids.Attribute(name=app['Attribute'][0], value=app['Attribute'][1]))
+
+
+
+
+
+
+    '''
+    my_spec.applicability.append(ids.Entity(name=spec[2], predefinedType=None if spec[3] == '' else spec[3]))
+                    for index, row in frame.iterrows():
+                        # add property requirement
+                        if row['have restriction'] == 'True' and row['property value'] != '':
+                            value = ids.Restriction(base=row['restriction base'], options={'pattern': row['property value']})
+                        else:
+                            value = None if row['property value'] == '' else row['property value']
+                        property = ids.Property(
+                            name=row['property name'],
+                            value=value,
+                            propertySet=row['property set'],
+                            measure=row['property type'],
+                            minOccurs=0 if row['optionality'].upper() in ['OPTIONAL', 'PROHIBITED'] else 1,
+                            maxOccurs='unbounded' if row['optionality'].upper() in ['REQUIRED', 'OPTIONAL'] else 0
+                        )
+
+                        my_spec.requirements.append(property)
+                        my_ids.specifications.append(my_spec)
+
+                st.session_state.ids = my_ids.to_string()
+     '''        
 
      
 
