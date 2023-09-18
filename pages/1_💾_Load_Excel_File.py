@@ -1,7 +1,7 @@
 import pandas as pd
 import streamlit as st
 import datetime
-from modules.ifctester import ids
+from ifctester import ids
 from PIL import Image
 
 # =========================================================================================================================
@@ -93,12 +93,15 @@ with st.container():
                             f':green[Predefined Type :]{spec[3]}')
                     st.markdown('**REQUIREMENTS:**')
                     st.write(frame[['property name',
-                                    'property type',
+                                    'data type',
+                                    'classification reference',
+                                    'classification system',
                                     'property set',
                                     'property value',
                                     'have restriction',
                                     'restriction base',
-                                    'optionality']]
+                                    'optionality',
+                                    'URI']]
                     )
 
             st.divider()
@@ -121,19 +124,35 @@ with st.container():
                     my_spec = ids.Specification(name=spec[0], description=spec[1], ifcVersion=ifc_version)
                     my_spec.applicability.append(ids.Entity(name=spec[2], predefinedType=None if spec[3] == '' else spec[3]))
                     for index, row in frame.iterrows():
-                        # add property requirement
-                        if row['have restriction'] == 'True' and row['property value'] != '':
-                            value = ids.Restriction(base=row['restriction base'], options={'pattern': row['property value']})
+                        if row['classification reference'] == '':
+                            # add property requirement
+                            if row['have restriction'] == 'True' and row['property value'] != '':
+                                value = ids.Restriction(base=row['restriction base'], options={'pattern': row['property value']})
+                            else:
+                                value = None if row['property value'] == '' else row['property value']
+                            property = ids.Property( 
+                                uri = row['URI'] if row['URI'] != '' else None,
+                                name=row['property name'],
+                                value=value,
+                                propertySet=row['property set'],
+                                datatype=row['data type'],
+                                minOccurs=0 if row['optionality'].upper() in ['OPTIONAL', 'PROHIBITED'] else 1,
+                                maxOccurs='unbounded' if row['optionality'].upper() in ['REQUIRED', 'OPTIONAL'] else 0
+                            )
+                            
                         else:
-                            value = None if row['property value'] == '' else row['property value']
-                        property = ids.Property(
-                            name=row['property name'],
-                            value=value,
-                            propertySet=row['property set'],
-                            measure=row['property type'],
-                            minOccurs=0 if row['optionality'].upper() in ['OPTIONAL', 'PROHIBITED'] else 1,
-                            maxOccurs='unbounded' if row['optionality'].upper() in ['REQUIRED', 'OPTIONAL'] else 0
-                        )
+                            # add classification requirement
+                            if row['have restriction'] == 'True' and row['property value'] != '':
+                                value = ids.Restriction(base=row['restriction base'], options={'pattern': row['property value']})
+                            else:
+                                value = None if row['classification reference'] == '' else row['classification reference']
+                            property = ids.Classification( 
+                                uri = row['URI'] if row['URI'] != '' else None,
+                                value=value,
+                                system=row['classification system'],
+                                minOccurs=0 if row['optionality'].upper() in ['OPTIONAL', 'PROHIBITED'] else 1,
+                                maxOccurs='unbounded' if row['optionality'].upper() in ['REQUIRED', 'OPTIONAL'] else 0
+                            )
 
                         my_spec.requirements.append(property)
                         my_ids.specifications.append(my_spec)
