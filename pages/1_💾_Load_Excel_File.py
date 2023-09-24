@@ -255,8 +255,8 @@ with st.container():
                             my_spec.requirements.append(parts)
                         
 
-                        # Add specification in specifications
-                        my_ids.specifications.append(my_spec)
+                    # Add specification in specifications
+                    my_ids.specifications.append(my_spec)
                         
                 
                 st.session_state.ids = my_ids.to_string()
