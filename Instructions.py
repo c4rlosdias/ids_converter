@@ -31,24 +31,9 @@ with st.sidebar:
 # =========================================================================================================================
 # Introduction screen
 # =========================================================================================================================
-dic = {'specification name'       : ['My_spec_01', 'My_spec_01', 'My_spec_02'],
-       'specification description': ['Walls needs this properties', 'Walls needs this properties', 'Slabs needs area'],
-       'entity'                   : ['IFCWALL', 'IFCWALL', 'IFCSLAB'],
-       'predefined type'          : ['STANDARD', 'STANDARD', 'FLOOR'],
-       'property name'            : ['IsExternal', 'LoadBearing', 'GrossArea'],
-       'property type'            : ['IFcBoolean', 'IfcBoolean', 'IfcAreaMeasure'],
-       'property set'             : ['Pset_WallCommon', 'Pset_WallCommon', 'Pset_SlabCommom'],
-       'property value'           : ['True', 'True', '[0-9]'],
-       'have restriction'         : ['False', 'False', 'True'],
-       'restriction base'         : ['string', 'string', 'string'],
-       'optionality'              : ['required', 'optional', 'required']
-       }
-
-df_sample = pd.DataFrame(dic)
-df_sample.set_index('specification name')
 
 st.header("IDS Converter")
-st.write('🇧🇷_By Carlos Dias_🇧🇷') 
+st.write('By Carlos Dias') 
 st.markdown('')
 st.markdown('IDS Converter generates an :blue[IDS file] from an :green[Excel file] or properties in a :green[buildingsmart data dictionary (bSDD)] domain.')
 st.markdown('')
@@ -61,19 +46,13 @@ st.markdown('')
 st.markdown('_IDS Converter uses [IfcOpenShell](http://ifcopenshell.org/)_')
 st.divider()
 st.markdown('the Excel file needs to have specific columns described bellow:')
-st.markdown(':blue[_specification name_]        : Specification name or code (necessary)')
-st.markdown(':blue[_specification description_] : Specification description (optional)')
-st.markdown(':blue[_entity_]                    : ifc type of the elements to be checked (necessary)')
-st.markdown(':blue[_predefined type_]           : predefined type of the elements to be checked (optional)')
-st.markdown(':blue[_property name_]             : requested property name (necessary)')
-st.markdown(':blue[_property type_]             : data type of the requested property (necessary)')
-st.markdown(':blue[_property set_]              : property set name (necessary)')
-st.markdown(':blue[_property value_]            : value requested in the property, when there is one (optional)')
-st.markdown(':blue[_have restriction_]          : if ''True'' then the property value is a pattern regular expression (RegExp) that needs to be matched by the property value (optional)')
-st.markdown(':blue[_restriction base_]          : data type of property value on restriction (optional)')
-st.markdown(':blue[_optionality_]               : property optionality, which can be :green[Required], :green[Optional], or :green[Prohibited] (necessary)')
-st.markdown('Example:')
-st.dataframe(df_sample)
+st.write('SPECIFICATION sheet:') 
+st.image('./resources/img/sheet1.png', width=500)
+st.write('APPLICABILITY sheet:') 
+st.image('./resources/img/sheet2.png', width=1500)
+st.write('REQUIREMENTS sheet:') 
+st.image('./resources/img/sheet3.png', width=1500)
+
 st.markdown('⚠️ Note that the same specification can occupy more than one row of the table!')
 st.markdown('')
 with open("./template/IDS_TEMPLATE.xlsx", "rb") as file:
