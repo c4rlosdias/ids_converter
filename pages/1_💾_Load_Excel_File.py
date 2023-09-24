@@ -98,14 +98,14 @@ with st.container():
                     df_app = st.session_state.df_applicability.query(f"specification == '{spec[0]}'").fillna('')
                     for index, app in df_app.iterrows():
                         for i in range(df_app.shape[1] - 1):
-                            if app[i] != '':
+                            if app[i] != '' and df_app.columns.to_list()[i] != 'specification':
                                 st.write(df_app.columns.to_list()[i] + ' : ' + app[i]) 
 
                     st.markdown(f':green[Requirements : ]')
                     df_req = st.session_state.df_requirements.query(f"specification == '{spec[0]}'").fillna('')
                     for index, req in df_req.iterrows():
                         for i in range(df_req.shape[1] - 1):
-                            if req[i] != '':
+                            if req[i] != '' and df_app.columns.to_list()[i] != 'specification':
                                 st.write(df_req.columns.to_list()[i] + ' : ' + req[i])  
 
             st.divider()
@@ -187,10 +187,6 @@ with st.container():
                             my_spec.applicability.append(material)
                         if parts:
                             my_spec.applicability.append(parts)
-
-
-                        # Add specification in specifications
-                        my_ids.specifications.append(my_spec)
 
                     # create requirements
                     for index, row in df_req_spec.iterrows():
