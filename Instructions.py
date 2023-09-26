@@ -40,20 +40,21 @@ st.markdown('')
 st.image('./resources/img/schema.png', width=450)
 st.markdown('')
 st.markdown('IDs is a standard that describes information exchange requirements and has incredible potential. ' +
-            'This converter, however, serves to create an ids with simple specifications, capable of indicating' +
-            ' which properties and values the model needs to have for each ifc type')
+            'This converter, however, serves to create an ids with specifications according to the facets described' +
+            'In sheets applicability and requirements')
 st.markdown('')
 st.markdown('_IDS Converter uses [IfcOpenShell](http://ifcopenshell.org/)_')
 st.divider()
-st.markdown('the Excel file needs to have specific columns described bellow:')
+st.markdown('In the specification sheet you must write your specifications:')
 st.write('SPECIFICATION sheet:') 
 st.image('./resources/img/sheet1.png', width=500)
+st.markdown('In the applicability sheet you must indicate wich elements must meet the requirements:')
 st.write('APPLICABILITY sheet:') 
 st.image('./resources/img/sheet2.png', width=1500)
+st.markdown('In the requirements sheet you must indicate wich requirements must be met:')
 st.write('REQUIREMENTS sheet:') 
 st.image('./resources/img/sheet3.png', width=1500)
 
-st.markdown('⚠️ Note that the same specification can occupy more than one row of the table!')
 st.markdown('')
 with open("./template/IDS_TEMPLATE.xlsx", "rb") as file:
     st.download_button('💾 Click here to download the template file!', data=file, file_name="IDS_TEMPLATE.xlsx")
