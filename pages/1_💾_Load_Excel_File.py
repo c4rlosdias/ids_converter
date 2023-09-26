@@ -5,6 +5,43 @@ from ifctester import ids
 from PIL import Image
 
 # =========================================================================================================================
+# pattern
+# =========================================================================================================================
+def pattern(value):
+    result = None if value == '' else value
+    try:
+        if value[:1] == '/' and value[-1:] == '/':
+            value = value[1:-1]
+            if 'enumeration' in value:
+                l = value.split('=')
+                enums = [j.strip() for j in l[1].split(',')]
+                result = ids.Restriction(base="string", options={'enumeration' : enums})
+            elif 'clusive=' in value:
+                l = value.split(',')                
+                options = {}
+                for it in l:
+                    key=it.split('=')[0].strip()
+                    val=int(it.split('=')[1].strip())
+                    options[key]=val
+                result = ids.Restriction(base="integer", options=options)
+            elif  'ength=' in value:
+                l = value.split(',')
+                options = {}
+                for it in l:
+                    key=it.split('=')[0].strip().strip()
+                    val=int(it.split('=')[1].strip())
+                    options[key]=val
+                result = ids.Restriction(base="string", options=options)
+            else:
+                result = ids.Restriction(base="string", options={'pattern' : value})   
+        print(result) 
+        return result
+    except:
+        return None
+
+
+
+# =========================================================================================================================
 # page config
 # =========================================================================================================================
 
@@ -47,8 +84,6 @@ with st.sidebar:
 
     uploaded_file = st.file_uploader("📥 Choose a XLSX file", type=['xlsx'])       
 
-
-    
 
 # =========================================================================================================================
 # If file loaded or bSDD connection
@@ -93,15 +128,23 @@ with st.container():
                 with st.expander(':green[Specification Name : ]' + spec[0]):
                     st.markdown(f':green[Description : ]{spec[1]}')
                     st.markdown(f':green[Optionality : ]{spec[2]}')
-                    st.markdown(f':green[Applicability : ]')
 
+                    st.markdown(f':green[Applied to : ]')
                     df_app = st.session_state.df_applicability.query(f"specification == '{spec[0]}'").fillna('')
                     for index, app in df_app.iterrows():
                         for i in range(df_app.shape[1] - 1):
                             if app[i] != '' and df_app.columns.to_list()[i] != 'specification':
                                 st.write(df_app.columns.to_list()[i] + ' : ' + app[i]) 
 
-                    st.markdown(f':green[Requirements : ]')
+                    if spec[2] == 'REQUIRED':
+                        st.markdown(f':green[MUST HAVE: ]')
+                    elif spec[2] == 'PROHIBITED':
+                        st.markdown(f':green[MUST NOT HAVE: ]')
+                    elif spec[2] == 'OPTIONAL':
+                        st.markdown(f':green[MAY HAVE: ]')
+                    else:
+                        st.markdown(f':green[requirements: ]')
+
                     df_req = st.session_state.df_requirements.query(f"specification == '{spec[0]}'").fillna('')
                     for index, req in df_req.iterrows():
                         for i in range(df_req.shape[1] - 1):
@@ -141,40 +184,47 @@ with st.container():
                         # add entity
                         
                         entity = ids.Entity(
-                            name=row['entity name'],
-                            predefinedType = row['predefined type'] if row['predefined type'] != '' else None,
+                            name=pattern(row['entity name']),
+                            predefinedType = pattern(row['predefined type'])
                         ) if row['entity name'] != '' else None
+                        
+                        #add attribute                        
+
+                        property = ids.Attribute(
+                            name  = pattern(row['attribute name']),
+                            value = pattern(row['attribute value'])
+                        ) if row['attribute name'] != '' else None
                         
                         #add property                        
 
                         property = ids.Property( 
-                            uri = row['URI'] if row['URI'] != '' else None,
-                            name=row['property name'],
-                            value=row['property value'] if row['property value'] != '' else None,
-                            propertySet=row['property set'] if row['property set'] != '' else None,
-                            datatype=row['data type'] if row['data type'] != '' else None
+                            uri         = row['URI'] if row['URI'] != '' else None,
+                            name        = pattern(row['property name']),
+                            value       = pattern(row['property value']),
+                            propertySet = pattern(row['property set']),
+                            datatype    = row['data type'] if row['data type'] != '' else None
                         ) if row['property name'] != '' else None
 
                         # add classification
 
                         classification = ids.Classification( 
-                            uri = row['URI'] if row['URI'] != '' else None,
-                            value=row['classification reference'] if row['classification reference'] != '' else None,
-                            system=row['classification system'] if row['classification system'] != '' else None
+                            uri    = row['URI'] if row['URI'] != '' else None,
+                            value  = pattern(row['classification reference']),
+                            system = pattern(row['classification system'])
                         ) if row['classification reference'] != '' else None
                         
                         # add material
 
                         material = ids.Material(
-                            uri = row['URI'] if row['URI'] != '' else None,
-                            value=row['material name'] if row['material name'] != '' else None
+                            uri   = row['URI'] if row['URI'] != '' else None,
+                            value = pattern(row['material name'])
                         ) if row['material name'] != '' else None
 
                         # add parts
 
                         parts = ids.PartOf(
-                            entity=row['part of entity'],
-                            relation=None if row['part of entity'] == '' else row['part of entity']
+                            entity   =row['part of entity'],
+                            relation =None if row['part of entity'] == '' else row['part of entity']
                         ) if row['part of entity'] != '' else None
 
                         if entity:
@@ -192,41 +242,52 @@ with st.container():
                     for index, row in df_req_spec.iterrows():
                             
                         # add entity
-                            
+
                         entity = ids.Entity(
-                            name=row['entity name'],
-                            predefinedType = row['predefined type'] if row['predefined type'] != '' else None                            
+                            name           = pattern(row['entity name']),
+                            predefinedType = pattern(row['predefined type']),
                         ) if row['entity name'] != '' else None
+
+                        #add attribute                        
+
+                        property = ids.Attribute(
+                            name        = pattern(row['attribute name']),
+                            value       = pattern(row['attribute value']),
+                            minOccurs   = 0 if row['optionality'].upper() in ['OPTIONAL', 'PROHIBITED'] else 1,
+                            maxOccurs   = 'unbounded' if row['optionality'].upper() in ['REQUIRED', 'OPTIONAL'] else 0
+                        ) if row['attribute name'] != '' else None
 
                         #add property                        
 
-                        property = ids.Property( 
-                            uri = row['URI'] if row['URI'] != '' else None,
-                            name=row['property name'],
-                            value=row['property value'] if row['property value'] != '' else None,
-                            propertySet=row['property set'] if row['property set'] != '' else None,
-                            datatype=row['data type'] if row['data type'] != '' else None,
-                            minOccurs=0 if row['optionality'].upper() in ['OPTIONAL', 'PROHIBITED'] else 1,
-                            maxOccurs='unbounded' if row['optionality'].upper() in ['REQUIRED', 'OPTIONAL'] else 0
+                        property = ids.Property(
+                            uri         = row['URI'] if row['URI'] != '' else None,
+                            name        = pattern(row['property name']),
+                            value       = pattern(row['property value']),
+                            propertySet = pattern(row['property set']),
+                            datatype    = row['data type'] if row['data type'] != '' else None,
+                            minOccurs   = 0 if row['optionality'].upper() in ['OPTIONAL', 'PROHIBITED'] else 1,
+                            maxOccurs   = 'unbounded' if row['optionality'].upper() in ['REQUIRED', 'OPTIONAL'] else 0
                         ) if row['property name'] != '' else None
+                        print(row['property name'])
+                        print(pattern(row['property name']))
 
                         # add classification
 
                         classification = ids.Classification(
-                            uri = row['URI'] if row['URI'] != '' else None,
-                            value=row['classification reference'] if row['classification reference'] != '' else None,
-                            system=row['classification system'] if row['classification system'] != '' else None,
-                            minOccurs=0 if row['optionality'].upper() in ['OPTIONAL', 'PROHIBITED'] else 1,
-                            maxOccurs='unbounded' if row['optionality'].upper() in ['REQUIRED', 'OPTIONAL'] else 0
+                            uri       = row['URI'] if row['URI'] != '' else None,
+                            value     = pattern(row['classification reference']),
+                            system    = pattern(row['classification system']),
+                            minOccurs = 0 if row['optionality'].upper() in ['OPTIONAL', 'PROHIBITED'] else 1,
+                            maxOccurs = 'unbounded' if row['optionality'].upper() in ['REQUIRED', 'OPTIONAL'] else 0
                         ) if row['classification reference'] != '' else None
                             
                         # add material
 
                         material = ids.Material(
-                            uri = row['URI'] if row['URI'] != '' else None,
-                            value=row['material name'] if row['material name'] != '' else None,
-                            minOccurs=0 if row['optionality'].upper() in ['OPTIONAL', 'PROHIBITED'] else 1,
-                            maxOccurs='unbounded' if row['optionality'].upper() in ['REQUIRED', 'OPTIONAL'] else 0
+                            uri       = row['URI'] if row['URI'] != '' else None,
+                            value     = pattern(row['material name']),
+                            minOccurs = 0 if row['optionality'].upper() in ['OPTIONAL', 'PROHIBITED'] else 1,
+                            maxOccurs = 'unbounded' if row['optionality'].upper() in ['REQUIRED', 'OPTIONAL'] else 0
                         ) if row['material name'] != '' else None
 
                         # add parts

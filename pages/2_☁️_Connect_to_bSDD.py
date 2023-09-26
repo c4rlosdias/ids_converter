@@ -4,7 +4,7 @@ import os.path
 import requests
 import streamlit as st
 import datetime
-from modules.ifctester import ids
+from ifctester import ids
 from PIL import Image
 
 
@@ -330,7 +330,7 @@ if st.session_state.loaded:
                         name=row['property name'],
                         value=value,
                         propertySet=row['property set'],
-                        measure=row['property type'],
+                        datatype=row['property type'],
                         minOccurs=0 if row['optionality'].upper() in ['OPTIONAL', 'PROHIBITED'] else 1,
                         maxOccurs='unbounded' if row['optionality'].upper() in ['REQUIRED', 'OPTIONAL'] else 0
                     )
