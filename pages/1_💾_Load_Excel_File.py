@@ -10,13 +10,20 @@ from PIL import Image
 def pattern(value):
     result = None if value == '' else value
     try:
+        if ',' in value:
+            enums = [j.strip() for j in value.split(',')]
+            if isinstance(value[0], str):
+                base = "string"
+            if isinstance(value[0], int):
+                base = "integer"
+            if isinstance(value[0], bool):
+                base = "boolean"
+            else:
+                base = "decimal"
+            result = ids.Restriction(base=base, options={'enumeration' : enums})
         if value[:1] == '/' and value[-1:] == '/':
             value = value[1:-1]
-            if 'enumeration' in value:
-                l = value.split('=')
-                enums = [j.strip() for j in l[1].split(',')]
-                result = ids.Restriction(base="string", options={'enumeration' : enums})
-            elif 'clusive=' in value:
+            if 'clusive=' in value:
                 l = value.split(',')                
                 options = {}
                 for it in l:
@@ -190,7 +197,7 @@ with st.container():
                         
                         #add attribute                        
 
-                        property = ids.Attribute(
+                        attribute = ids.Attribute(
                             name  = pattern(row['attribute name']),
                             value = pattern(row['attribute value'])
                         ) if row['attribute name'] != '' else None
@@ -211,7 +218,7 @@ with st.container():
                             uri    = row['URI'] if row['URI'] != '' else None,
                             value  = pattern(row['classification reference']),
                             system = pattern(row['classification system'])
-                        ) if row['classification reference'] != '' else None
+                        ) if row['classification reference'] != '' and row['classification system'] != '' else None
                         
                         # add material
 
@@ -223,12 +230,14 @@ with st.container():
                         # add parts
 
                         parts = ids.PartOf(
-                            entity   =row['part of entity'],
-                            relation =None if row['part of entity'] == '' else row['part of entity']
+                            entity   =row['part of entity'].upper(),
+                            relation =None if row['relation'] == '' else row['relation']
                         ) if row['part of entity'] != '' else None
 
                         if entity:
                             my_spec.applicability.append(entity) 
+                        if attribute:
+                            my_spec.applicability.append(attribute)
                         if property:
                             my_spec.applicability.append(property)
                         if classification:
@@ -240,7 +249,7 @@ with st.container():
 
                     # create requirements
                     for index, row in df_req_spec.iterrows():
-                            
+                        row['optionality'] = 'REQUIRED' if row['optionality'] == '' else row['optionality']   
                         # add entity
 
                         entity = ids.Entity(
@@ -250,11 +259,9 @@ with st.container():
 
                         #add attribute                        
 
-                        property = ids.Attribute(
+                        attribute = ids.Attribute(
                             name        = pattern(row['attribute name']),
-                            value       = pattern(row['attribute value']),
-                            minOccurs   = 0 if row['optionality'].upper() in ['OPTIONAL', 'PROHIBITED'] else 1,
-                            maxOccurs   = 'unbounded' if row['optionality'].upper() in ['REQUIRED', 'OPTIONAL'] else 0
+                            value       = pattern(row['attribute value'])
                         ) if row['attribute name'] != '' else None
 
                         #add property                        
@@ -268,8 +275,6 @@ with st.container():
                             minOccurs   = 0 if row['optionality'].upper() in ['OPTIONAL', 'PROHIBITED'] else 1,
                             maxOccurs   = 'unbounded' if row['optionality'].upper() in ['REQUIRED', 'OPTIONAL'] else 0
                         ) if row['property name'] != '' else None
-                        print(row['property name'])
-                        print(pattern(row['property name']))
 
                         # add classification
 
@@ -279,7 +284,7 @@ with st.container():
                             system    = pattern(row['classification system']),
                             minOccurs = 0 if row['optionality'].upper() in ['OPTIONAL', 'PROHIBITED'] else 1,
                             maxOccurs = 'unbounded' if row['optionality'].upper() in ['REQUIRED', 'OPTIONAL'] else 0
-                        ) if row['classification reference'] != '' else None
+                        ) if row['classification reference'] != '' and row['classification system'] != '' else None
                             
                         # add material
 
@@ -293,8 +298,8 @@ with st.container():
                         # add parts
 
                         parts = ids.PartOf(
-                            entity=None if row['part of entity'] == '' else row['part of entity'],
-                            relation=None if row['part of entity'] == '' else row['part of entity'],
+                            entity=row['part of entity'].upper(),
+                            relation=None if row['relation'] == '' else row['relation'],
                             minOccurs=0 if row['optionality'].upper() in ['OPTIONAL', 'PROHIBITED'] else 1,
                             maxOccurs='unbounded' if row['optionality'].upper() in ['REQUIRED', 'OPTIONAL'] else 0
                         ) if row['part of entity'] != '' else None
@@ -302,6 +307,8 @@ with st.container():
   
                         if entity:
                             my_spec.requirements.append(entity) 
+                        if attribute:
+                            my_spec.requirements.append(attribute)
                         if property:
                             my_spec.requirements.append(property)
                         if classification:
