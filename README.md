@@ -12,7 +12,7 @@ Still in Beta version, for testing purposes, this app is open for use by anyone 
 (IDS Converter uses [Ifcopenshell](http://ifcopenshell.org/))
 
 ## Try on:
-https://idsconverter.herokuapp.com/
+[http;//idsconverter.streamlit.app](https://idsconverter.streamlit.app/)
 
 ## TODO:
 - [ ] Include other types of restrictions accepted by the IDS;
