@@ -12,14 +12,15 @@ def pattern(value):
     try:
         if ',' in value:
             enums = [j.strip() for j in value.split(',')]
-            if isinstance(value[0], str):
+            if isinstance(enums[0], str):
                 base = "string"
-            if isinstance(value[0], int):
+            elif isinstance(enums[0], int):
                 base = "integer"
-            if isinstance(value[0], bool):
+            elif isinstance(enums[0], bool):
                 base = "boolean"
             else:
                 base = "decimal"
+            
             result = ids.Restriction(base=base, options={'enumeration' : enums})
         if value[:1] == '/' and value[-1:] == '/':
             value = value[1:-1]
@@ -40,9 +41,10 @@ def pattern(value):
                     options[key]=val
                 result = ids.Restriction(base="string", options=options)
             else:
-                result = ids.Restriction(base="string", options={'pattern' : value})   
+                result = ids.Restriction(base="string", options={'pattern' : value})  
         print(result) 
         return result
+    
     except:
         return None
 
@@ -132,31 +134,31 @@ with st.container():
             st.markdown(':white_check_mark: :green[check your specifications:]')
 
             for index, spec in st.session_state.df_specifications.iterrows():
-                with st.expander(':green[Specification Name : ]' + spec[0]):
-                    st.markdown(f':green[Description : ]{spec[1]}')
-                    st.markdown(f':green[Optionality : ]{spec[2]}')
+                with st.expander(':green[Specification Name : ]' + spec.iloc[0]):
+                    st.markdown(f':green[Description : ]{spec.iloc[1]}')
+                    st.markdown(f':green[Optionality : ]{spec.iloc[2]}')
 
                     st.markdown(f':green[Applied to : ]')
-                    df_app = st.session_state.df_applicability.query(f"specification == '{spec[0]}'").fillna('')
+                    df_app = st.session_state.df_applicability.query(f"specification == '{spec.iloc[0]}'").fillna('')
                     for index, app in df_app.iterrows():
                         for i in range(df_app.shape[1] - 1):
-                            if app[i] != '' and df_app.columns.to_list()[i] != 'specification':
-                                st.write(df_app.columns.to_list()[i] + ' : ' + app[i]) 
+                            if app.iloc[i] != '' and df_app.columns.to_list()[i] != 'specification':
+                                st.write(df_app.columns.to_list()[i] + ' : ' + app.iloc[i]) 
 
-                    if spec[2] == 'REQUIRED':
+                    if spec.iloc[2] == 'REQUIRED':
                         st.markdown(f':green[MUST HAVE: ]')
-                    elif spec[2] == 'PROHIBITED':
+                    elif spec.iloc[2] == 'PROHIBITED':
                         st.markdown(f':green[MUST NOT HAVE: ]')
-                    elif spec[2] == 'OPTIONAL':
+                    elif spec.iloc[2] == 'OPTIONAL':
                         st.markdown(f':green[MAY HAVE: ]')
                     else:
                         st.markdown(f':green[requirements: ]')
 
-                    df_req = st.session_state.df_requirements.query(f"specification == '{spec[0]}'").fillna('')
+                    df_req = st.session_state.df_requirements.query(f"specification == '{spec.iloc[0]}'").fillna('')
                     for index, req in df_req.iterrows():
                         for i in range(df_req.shape[1] - 1):
-                            if req[i] != '' and df_app.columns.to_list()[i] != 'specification':
-                                st.write(df_req.columns.to_list()[i] + ' : ' + req[i])  
+                            if req.iloc[i] != '' and df_app.columns.to_list()[i] != 'specification':
+                                st.write(df_req.columns.to_list()[i] + ' : ' + req.iloc[i])  
 
             st.divider()
 
@@ -176,15 +178,15 @@ with st.container():
                 )
                 for index, spec in st.session_state.df_specifications.iterrows():
                     my_spec = ids.Specification(
-                        name=spec[0],
-                        description=spec[1],
-                        minOccurs=0 if spec[2].upper() in ['OPTIONAL', 'PROHIBITED'] else 1,
-                        maxOccurs='unbounded' if spec[2].upper() in ['REQUIRED', 'OPTIONAL'] else 0,
+                        name=spec.iloc[0],
+                        description=spec.iloc[1],
+                        minOccurs=0 if spec.iloc[2].upper() in ['OPTIONAL', 'PROHIBITED'] else 1,
+                        maxOccurs='unbounded' if spec.iloc[2].upper() in ['REQUIRED', 'OPTIONAL'] else 0,
                         ifcVersion=ifc_version
                     )
                     
-                    df_app_spec = st.session_state.df_applicability.query(f"specification == '{spec[0]}'").fillna('')
-                    df_req_spec = st.session_state.df_requirements.query(f"specification == '{spec[0]}'").fillna('')
+                    df_app_spec = st.session_state.df_applicability.query(f"specification == '{spec.iloc[0]}'").fillna('')
+                    df_req_spec = st.session_state.df_requirements.query(f"specification == '{spec.iloc[0]}'").fillna('')
 
                     # create applicability
                     for index, row in df_app_spec.iterrows():                        
@@ -325,7 +327,7 @@ with st.container():
                 
                 st.session_state.ids = my_ids.to_string()
 
-                if st.session_state.ids:
+                if st.session_state.ids is not None:
                     st.session_state.convert = True                
                     st.balloons()
                 else:
