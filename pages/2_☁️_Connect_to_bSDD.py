@@ -31,9 +31,9 @@ def properties_search(domain, json):
     result = None
     
     if response.status_code == 200:
-        l_prop, l_class, l_code, l_desc = [], [], [], []
-        l_predefinetype, l_type, l_pset = [], [], []
-        l_pvalue, l_haverestriction, l_restrictionbase, l_optionality = [], [], [], []
+        l_prop, l_class, l_code, l_desc, l_mat          = [], [], [], [], []
+        l_predefinetype, l_type, l_pset, l_optionality  = [], [], [], []
+        l_pvalue, l_haverestriction, l_restrictionbase = [], [], []
 
         classifications = response.json()['classifications']
         progress_text = "Operation in progress. Please wait."
@@ -51,12 +51,21 @@ def properties_search(domain, json):
                     if len(class_properties) > 0:
                         for property in class_properties:
                             my_bar.progress(percent_complete if percent_complete < 1 else 1, text=progress_text)                            
-                            l_code.append(classe['referenceCode'])                            
+                            material = None
+                            if 'classificationRelations' in classe:
+                                relations = classe['classificationRelations']
+                                code = classe['referenceCode'] if 'referenceCode' in classe else  classe['code']
+                                if len(relations) > 0:
+                                    for relation in relations:
+                                        if relation['relationType'] == 'HasMaterial':
+                                            material = relation['relatedClassificationName']
+                            l_mat.append(material)                        
+                            l_code.append(code)
                             l_predefinetype.append(None)
                             l_prop.append(property['name'] if 'name' in property else None)
                             l_type.append(property['dataType'] if 'dataType' in property else None)
                             l_pset.append(property['propertySet'] if 'propertySet' in property else None)
-                            l_pvalue.append(property['pattern'] if 'pattern' in property else None)
+                            l_pvalue.append(property['predefinedValue'] if 'predefinedValue' in property else None)
                             if 'isRequired' in property:
                                 l_optionality.append('required' if property['isRequired'] == True else 'optional')
                             else:
@@ -64,13 +73,13 @@ def properties_search(domain, json):
 
                             if 'relatedIfcEntityNames' in classe:
                                 l_class.append(classe['relatedIfcEntityNames'][0] if len(classe['relatedIfcEntityNames']) > 0 else None)
-                                l_desc.append(f'The entity {classe["relatedIfcEntityNames"]} needs this properties')
+                                l_desc.append(f'Class {code}  - {classe["definition"]}')
                             else:
                                 l_class.append('WARNING : NO IFC TYPE DEFINED')
                                 l_desc.append('WARNING : NO IFC TYPE DEFINED')
                             if 'pattern' in property:
-                                l_haverestriction.append(True if property['pattern'] else False)
-                                l_restrictionbase.append('string' if property['pattern'] else None)
+                                l_haverestriction.append(True)
+                                l_restrictionbase.append(property['dataType'])
                             else:
                                 l_haverestriction.append(False)
                                 l_restrictionbase.append(None)            
@@ -85,6 +94,7 @@ def properties_search(domain, json):
                'specification description'  : l_desc,
                'property name'              : l_prop,
                'entity'                     : l_class,
+               'material'                   : l_mat,
                'predefined type'            : l_predefinetype,
                'property name'              : l_prop,
                'property type'              : l_type,
@@ -94,7 +104,6 @@ def properties_search(domain, json):
                'restriction base'           : l_restrictionbase,
                'optionality'                : l_optionality
         }
-
         df = pd.DataFrame(dic)
         result = df    
 
@@ -103,88 +112,6 @@ def properties_search(domain, json):
 
     return result
             
-                
-# =========================================================================================================================
-# get bSDD data with graphql - [!] not working in production enviroment
-# =========================================================================================================================
-
-@st.cache_data
-def graphql_search(domain):
-    url = 'https://api.bsdd.buildingsmart.org/graphql'
-    namespaceUri = search_json(domain, "namespaceUri", response.json())
-    query_todo = f'''{{domain(namespaceUri: "{namespaceUri}") {{
-                            name
-                            namespaceUri
-                            classificationSearch {{
-                                code
-                                name
-                                namespaceUri
-                                relatedIfcEntityNames
-                                properties {{
-                                        propertySet
-                                        name
-                                        namespaceUri
-                                        isRequired
-                                        dataType
-                                        pattern
-                                        units
-                                }}
-                            }}
-                        }}
-                    }}'''
-
-    payload = {'query': query_todo}
-    r = requests.post(url, json= payload)
-    st.write(r.status_code)
-
-    if r.status_code == 200:
-
-        classifications = r.json()['data']['domain']['classificationSearch']
-        l_prop, l_class, l_code, l_desc = [], [], [], []
-        l_entity, l_predefinetype, l_type, l_pset = [], [], [], []
-        l_pvalue, l_haverestriction, l_restrictionbase, l_optionality = [], [], [], []
-
-        for classification in classifications:
-            properties = classification['properties']
-            if len(properties) > 0:
-                for property in properties:
-                    l_code.append(classification['code'])
-                    l_desc.append(f'The entity {classification["relatedIfcEntityNames"]} needs properties')
-                    l_entity.append(classification['relatedIfcEntityNames'])
-                    l_predefinetype.append(None)
-                    l_prop.append(property['name'])
-                    l_type.append(property['dataType'])
-                    l_pset.append(property['propertySet'])
-                    l_pvalue.append(property['pattern'])
-                    l_haverestriction.append(True if property['pattern'] else False)
-                    l_restrictionbase.append('string' if property['pattern'] else None)
-                    l_optionality.append('required' if property['isRequired'] == True else 'optional')
-                    if len(classification['relatedIfcEntityNames']) > 0:
-                        l_class.append(classification['relatedIfcEntityNames'][0])
-                    else:
-                        l_class.append(None)
-
-        dic = {'specification name'         : l_code,
-               'specification description'  : l_desc,
-               'property name'              : l_prop,
-               'entity'                     : l_class,
-               'predefined type'            : l_predefinetype,
-               'property name'              : l_prop,
-               'property type'              : l_type,
-               'property set'               : l_pset,
-               'property value'             : l_pvalue,
-               'have restriction'           : l_haverestriction,
-               'restriction base'           : l_restrictionbase,
-               'optionality'                : l_optionality
-        }
-
-        df = pd.DataFrame(dic)
-        result = df
-    else:
-        st.error('⚠️ ERROR : Something wrong!')
-        result = None
-
-    return result
 
 # =========================================================================================================================
 # page config
@@ -235,7 +162,9 @@ with st.sidebar:
             st.session_state.response = response.json()
             domains = []
             for domain in st.session_state.response:
-                domains.append(domain["name"] + ' ' + domain["version"])
+                if domain['status'] != 'Inactive':
+                    domains.append(domain["name"] + ' ' + domain["version"]) 
+            domains.sort()
             st.session_state.domains = domains
             
                     
@@ -284,14 +213,17 @@ if st.session_state.loaded:
             st.markdown(':white_check_mark: :green[check your specifications:]')
 
             df = st.session_state.df.fillna('')
-            df_group = df.groupby(['specification name', 'specification description', 'entity', 'predefined type'])
-
+            df_group = df.groupby(['specification name', 'specification description', 'entity', 'predefined type', 'material'])
+            
             for spec, frame in df_group:
-                with st.expander(':green[Specification Name :]' + spec[0]):
-                    st.markdown(f':green[Description:]{spec[1]}')
+                with st.expander(':green[Specification Name : ]' + spec[0]):
+                    st.markdown(f':green[Description: ]{spec[1]}')
                     st.markdown('**APPLICABILITY:**')
-                    st.write(f':green[Entity :]{spec[2]} - ',
-                            f':green[Predefined Type :]{spec[3]}')
+                    st.write(f':green[Entity :]{spec[2]}')
+                    if spec[3] != '':
+                        st.write(f':green[with Predefined Type : ]{spec[3]}')
+                    if spec[4] is not None:
+                        st.write(f':green[with material : ]{spec[4]}')
                     st.markdown('**REQUIREMENTS:**')
                     st.write(frame[['property name',
                                     'property type',
@@ -318,8 +250,10 @@ if st.session_state.loaded:
                             milestone=milestone
             )
             for spec, frame in df_group:
-                my_spec = ids.Specification(name=spec[0], description=spec[1], ifcVersion=ifc_version)
+                my_spec = ids.Specification(name=spec[0], description=spec[0], ifcVersion=ifc_version)
                 my_spec.applicability.append(ids.Entity(name=spec[2], predefinedType=None if spec[3] == '' else spec[3]))
+                my_spec.applicability.append(ids.Classification(value=spec[0]))
+                my_spec.applicability.append(ids.Material(value=spec[4]))                
                 for index, row in frame.iterrows():
                     # add property requirement
                     if row['have restriction'] == 'True' and row['property value'] != '':
