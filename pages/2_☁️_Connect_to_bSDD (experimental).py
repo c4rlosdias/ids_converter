@@ -73,7 +73,7 @@ def properties_search(domain, json):
 
                             if 'relatedIfcEntityNames' in classe:
                                 l_class.append(classe['relatedIfcEntityNames'][0] if len(classe['relatedIfcEntityNames']) > 0 else None)
-                                l_desc.append(f'Class {code}  - {classe["definition"]}')
+                                l_desc.append(f'Objects with class: {code} MUST BE this properties')
                             else:
                                 l_class.append('WARNING : NO IFC TYPE DEFINED')
                                 l_desc.append('WARNING : NO IFC TYPE DEFINED')
@@ -214,17 +214,23 @@ if st.session_state.loaded:
 
             df = st.session_state.df.fillna('')
             df_group = df.groupby(['specification name', 'specification description', 'entity', 'predefined type', 'material'])
+            st.dataframe(df)
+            st.dataframe(df_group)
             
             for spec, frame in df_group:
-                with st.expander(':green[Specification Name : ]' + spec[0]):
-                    st.markdown(f':green[Description: ]{spec[1]}')
+                with st.expander(':green[Specification Name : ] ' + spec[0]):
+                    st.markdown(f':green[Description: ] {spec[1]}')
+
                     st.markdown('**APPLICABILITY:**')
-                    st.write(f':green[Entity :]{spec[2]}')
+                    st.write(f':green[Entity :] {spec[2]}')
                     if spec[3] != '':
-                        st.write(f':green[with Predefined Type : ]{spec[3]}')
-                    if spec[4] is not None:
-                        st.write(f':green[with material : ]{spec[4]}')
+                        st.write(f':green[with Predefined Type : ] {spec[3]}')
+                    st.write(f':green[With reference class equal to ] {spec[0]}]')
+
                     st.markdown('**REQUIREMENTS:**')
+                    if spec[4] is not None:
+                        st.write(f':green[Must be material] {spec[4]}')
+                    st.write(':green[With this properties requirements:]')
                     st.write(frame[['property name',
                                     'property type',
                                     'property set',
@@ -250,10 +256,10 @@ if st.session_state.loaded:
                             milestone=milestone
             )
             for spec, frame in df_group:
-                my_spec = ids.Specification(name=spec[0], description=spec[0], ifcVersion=ifc_version)
+                my_spec = ids.Specification(name=spec[0], description=spec[1], ifcVersion=ifc_version)
                 my_spec.applicability.append(ids.Entity(name=spec[2], predefinedType=None if spec[3] == '' else spec[3]))
                 my_spec.applicability.append(ids.Classification(value=spec[0]))
-                my_spec.applicability.append(ids.Material(value=spec[4]))                
+                               
                 for index, row in frame.iterrows():
                     # add property requirement
                     if row['have restriction'] == 'True' and row['property value'] != '':
@@ -270,7 +276,8 @@ if st.session_state.loaded:
                     )
 
                     my_spec.requirements.append(property)
-                    my_ids.specifications.append(my_spec)
+                my_spec.requirements.append(ids.Material(value=ids.Restriction(base='string', options={'pattern': '.*' + spec[4] + '.*'}))) 
+                my_ids.specifications.append(my_spec)
 
             st.session_state.ids = my_ids.to_string()
             if st.session_state.ids is not None:       

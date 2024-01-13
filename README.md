@@ -15,7 +15,7 @@ Still in Beta version, for testing purposes, this app is open for use by anyone 
 [http;//idsconverter.streamlit.app](https://idsconverter.streamlit.app/)
 
 ## TODO:
-- [ ] Include other types of restrictions accepted by the IDS;
+- [X] Include other types of restrictions accepted by the IDS;
 - [X] Connection with bSDD;
 - [ ] Add a IDS validator
 - [ ] Add a BCF creator

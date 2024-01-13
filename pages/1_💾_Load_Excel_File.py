@@ -325,7 +325,11 @@ with st.container():
                     my_ids.specifications.append(my_spec)
                         
                 
-                st.session_state.ids = my_ids.to_string()
+                try:
+                    st.session_state.ids = my_ids.to_string()
+                except:
+                    st.error("ERRO : Review your spreadsheet, there's something wrong with your specification!")
+                    st.session_state.ids = None
 
                 if st.session_state.ids is not None:
                     st.session_state.convert = True                
