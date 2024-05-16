@@ -21,7 +21,7 @@ st.set_page_config(
 
 with st.sidebar:
     
-    st.title('IDS Converter')
+    st.title('IDS Converter v1.1')
     st.image('./resources/img/LOGO 1X1_2.PNG', width=150)
     st.write('Choose a option above:')
     st.divider()
@@ -32,16 +32,16 @@ with st.sidebar:
 # Introduction screen
 # =========================================================================================================================
 
-st.header("IDS Converter")
+st.header("IDS Converter v1.1")
 st.write('By Carlos Dias') 
 st.markdown('')
-st.markdown('IDS Converter generates an :blue[IDS file] from an :green[Excel file] or properties in a :green[buildingsmart data dictionary (bSDD)] domain.')
+st.markdown('IDS Converter generates an :blue[IDS file] from an :green[Excel file].')
 st.markdown('')
 st.image('./resources/img/schema.png', width=450)
 st.markdown('')
 st.markdown('IDs is a standard that describes information exchange requirements and has incredible potential. ' +
             'This converter, however, serves to create an ids with specifications according to the facets described' +
-            'In sheets applicability and requirements')
+            'In sheets applicability and requirements. IDS Converter is compatible with version 0.9.7 of IDS')
 st.markdown('')
 st.markdown('_IDS Converter uses [IfcOpenShell](http://ifcopenshell.org/)_')
 st.divider()

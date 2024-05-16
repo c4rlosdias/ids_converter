@@ -4,6 +4,7 @@ import datetime
 from ifctester import ids
 from PIL import Image
 
+
 # =========================================================================================================================
 # pattern
 # =========================================================================================================================
@@ -206,18 +207,16 @@ with st.container():
                         
                         #add property                        
 
-                        property = ids.Property( 
-                            uri         = row['URI'] if row['URI'] != '' else None,
-                            name        = pattern(row['property name']),
+                        property = ids.Property(
+                            baseName    = pattern(row['property name']),
                             value       = pattern(row['property value']),
                             propertySet = pattern(row['property set']),
-                            datatype    = row['data type'] if row['data type'] != '' else None
+                            dataType    = row['data type'] if row['data type'] != '' else None
                         ) if row['property name'] != '' else None
 
                         # add classification
 
                         classification = ids.Classification( 
-                            uri    = row['URI'] if row['URI'] != '' else None,
                             value  = pattern(row['classification reference']),
                             system = pattern(row['classification system'])
                         ) if row['classification reference'] != '' and row['classification system'] != '' else None
@@ -225,16 +224,17 @@ with st.container():
                         # add material
 
                         material = ids.Material(
-                            uri   = row['URI'] if row['URI'] != '' else None,
                             value = pattern(row['material name'])
                         ) if row['material name'] != '' else None
 
                         # add parts
 
                         parts = ids.PartOf(
-                            entity   =row['part of entity'].upper(),
+                            name   =row['part of entity'].upper(),
                             relation =None if row['relation'] == '' else row['relation']
                         ) if row['part of entity'] != '' else None
+
+                        
 
                         if entity:
                             my_spec.applicability.append(entity) 
@@ -251,31 +251,34 @@ with st.container():
 
                     # create requirements
                     for index, row in df_req_spec.iterrows():
-                        row['optionality'] = 'REQUIRED' if row['optionality'] == '' else row['optionality']   
+                        row['cardinality'] = 'required' if row['cardinality'] == '' else row['cardinality']   
                         # add entity
 
                         entity = ids.Entity(
                             name           = pattern(row['entity name']),
                             predefinedType = pattern(row['predefined type']),
+                            instructions   = row['instructions'] if row['instructions'] != '' else None
                         ) if row['entity name'] != '' else None
 
                         #add attribute                        
 
                         attribute = ids.Attribute(
                             name        = pattern(row['attribute name']),
-                            value       = pattern(row['attribute value'])
+                            value       = pattern(row['attribute value']),
+                            cardinality = row['cardinality'],
+                            instructions   = row['instructions'] if row['instructions'] != '' else None
                         ) if row['attribute name'] != '' else None
 
                         #add property                        
 
                         property = ids.Property(
                             uri         = row['URI'] if row['URI'] != '' else None,
-                            name        = pattern(row['property name']),
+                            baseName    = pattern(row['property name']),
                             value       = pattern(row['property value']),
                             propertySet = pattern(row['property set']),
-                            datatype    = row['data type'] if row['data type'] != '' else None,
-                            minOccurs   = 0 if row['optionality'].upper() in ['OPTIONAL', 'PROHIBITED'] else 1,
-                            maxOccurs   = 'unbounded' if row['optionality'].upper() in ['REQUIRED', 'OPTIONAL'] else 0
+                            dataType    = row['data type'] if row['data type'] != '' else None,
+                            instructions  = row['instructions'] if row['instructions'] != '' else None,
+                            cardinality = row['cardinality']
                         ) if row['property name'] != '' else None
 
                         # add classification
@@ -284,8 +287,7 @@ with st.container():
                             uri       = row['URI'] if row['URI'] != '' else None,
                             value     = pattern(row['classification reference']),
                             system    = pattern(row['classification system']),
-                            minOccurs = 0 if row['optionality'].upper() in ['OPTIONAL', 'PROHIBITED'] else 1,
-                            maxOccurs = 'unbounded' if row['optionality'].upper() in ['REQUIRED', 'OPTIONAL'] else 0
+                            cardinality = row['cardinality']
                         ) if row['classification reference'] != '' and row['classification system'] != '' else None
                             
                         # add material
@@ -293,17 +295,17 @@ with st.container():
                         material = ids.Material(
                             uri       = row['URI'] if row['URI'] != '' else None,
                             value     = pattern(row['material name']),
-                            minOccurs = 0 if row['optionality'].upper() in ['OPTIONAL', 'PROHIBITED'] else 1,
-                            maxOccurs = 'unbounded' if row['optionality'].upper() in ['REQUIRED', 'OPTIONAL'] else 0
+                            instructions = row['instructions'] if row['instructions'] != '' else None,
+                            cardinality = row['cardinality']
                         ) if row['material name'] != '' else None
 
                         # add parts
 
                         parts = ids.PartOf(
-                            entity=row['part of entity'].upper(),
+                            name=row['part of entity'].upper(),
                             relation=None if row['relation'] == '' else row['relation'],
-                            minOccurs=0 if row['optionality'].upper() in ['OPTIONAL', 'PROHIBITED'] else 1,
-                            maxOccurs='unbounded' if row['optionality'].upper() in ['REQUIRED', 'OPTIONAL'] else 0
+                            instructions   = row['instructions'] if row['instructions'] != '' else None,
+                            cardinality = row['cardinality']
                         ) if row['part of entity'] != '' else None
                          
   
