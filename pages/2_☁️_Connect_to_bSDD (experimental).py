@@ -26,8 +26,8 @@ def search_json(search, value, json):
 def properties_search(domain, json):
     namespaceUri = search_json(domain, "namespaceUri", json)
     params = {'namespaceUri' : namespaceUri, 'useNestedClassifications' : 'false'}
-    response = requests.get('https://api.bsdd.buildingsmart.org/api/Domain/v3/Classifications', params)
-
+    response = requests.get('https://api.bsdd.buildingsmart.org/api/Dictionary/v1/Classes', params)
+    
     result = None
     
     if response.status_code == 200:
@@ -108,7 +108,7 @@ def properties_search(domain, json):
         result = df    
 
     else:
-        st.error('ERRO: ' + str(response.status_code) + 'for domain:' + domain)
+        st.error('ERRO: ' + str(response.status_code) + 'for dictionary:' + domain)
 
     return result
             
@@ -154,138 +154,96 @@ if 'domain_active' not in st.session_state:
 # =========================================================================================================================
 # Sidebar
 # =========================================================================================================================
-
 with st.sidebar:
-    if not st.session_state.response:
-        response = requests.get('https://api.bsdd.buildingsmart.org/api/Domain/v3')
-        if response.status_code == 200:
-            st.session_state.response = response.json()
-            domains = []
-            for domain in st.session_state.response:
-                if domain['status'] != 'Inactive':
-                    domains.append(domain["name"] + ' ' + domain["version"]) 
-            domains.sort()
-            st.session_state.domains = domains
-            
-                    
-    domain = st.selectbox('Select domain', st.session_state.domains)
-    loaded = st.button('Load domain')
-    if loaded:
-        st.session_state.loaded = True
-        st.session_state.domain_active = domain
-     
+    languages = requests.get(f'https://api.bsdd.buildingsmart.org/api/Language/v1')
+    if languages.status_code == 200:
+        l_lang = [k['name'] for k in languages.json()]
+        language = st.selectbox('Select a Dictionary Language', l_lang) 
+
+
 
 # =========================================================================================================================
 # If file loaded or bSDD connection
 # =========================================================================================================================
 
-if st.session_state.loaded:
-    with st.container():
+with st.container():
+    # Search text    
 
-        # Create Dataframe
+    search_text = st.text_input('_Search Text:_')
 
-        if loaded:
-            st.session_state.df = properties_search(domain, st.session_state.response)
+    if search_text != '':
+        response = requests.get(f'https://api.bsdd.buildingsmart.org/api/TextSearch/v1?SearchText={search_text}')
 
-        st.session_state.file_name = domain + '.ids' 
-        
-        if st.session_state.df is not None:
-            st.title('Domain: ' + st.session_state.domain_active)
-            st.divider()
-            st.header('IDS Information')
+        # Show results
+        if response.status_code == 200:
+            response_json = response.json()
             
-            col1, col2 = st.columns(2, gap="large")
-            with col1:
-                title       = st.text_input('_Title:_')
-                copyright   = st.text_input('_Copyright:_')
-                version     = st.text_input('_Version:_')
-                author      = st.text_input('_Author:_', 'xxxxx@xxxxx.xxx')
-                ifc_version = st.selectbox('_IFC Version:_', ('IFC2X3', 'IFC4', 'IFC4X3'))
+            classes = response_json['classes'] if 'classes' in response_json else None
+            dictionaries = response_json['dictionaries'] if 'dictionaries' in response_json else None
+            properties = response_json['properties'] if 'properties' in response_json else None
+            total_count = response_json['totalCount']
+            df_classes = pd.DataFrame(classes)
 
-            with col2:
-                date        = st.text_input('_Date:_', datetime.date.today())
-                description = st.text_input('_Description:_')
-                purpose     = st.text_input('_Purpose:_')
-                milestone   = st.text_input('_Milestone:_')
-
-            st.divider()
-
-            st.markdown(':white_check_mark: :green[check your specifications:]')
-
-            df = st.session_state.df.fillna('')
-            df_group = df.groupby(['specification name', 'specification description', 'entity', 'predefined type', 'material'])
-            st.dataframe(df)
-            st.dataframe(df_group)
+            st.write(f'Total count: {total_count}')
             
-            for spec, frame in df_group:
-                with st.expander(':green[Specification Name : ] ' + spec[0]):
-                    st.markdown(f':green[Description: ] {spec[1]}')
+            ldic_names = [d['name'] for d in dictionaries]
+            dict = st.selectbox('Select Dictionary', ldic_names)            
+            uris = [d['uri'] for d in dictionaries if d['name'] == dict]
+            st.write('Dictionary URI:')
+            for uri in uris:
+                st.write(uri)
 
-                    st.markdown('**APPLICABILITY:**')
-                    st.write(f':green[Entity :] {spec[2]}')
-                    if spec[3] != '':
-                        st.write(f':green[with Predefined Type : ] {spec[3]}')
-                    st.write(f':green[With reference class equal to ] {spec[0]}]')
 
-                    st.markdown('**REQUIREMENTS:**')
-                    if spec[4] is not None:
-                        st.write(f':green[Must be material] {spec[4]}')
-                    st.write(':green[With this properties requirements:]')
-                    st.write(frame[['property name',
-                                    'property type',
-                                    'property set',
-                                    'property value',
-                                    'have restriction',
-                                    'restriction base',
-                                    'optionality']]
-                    )
+            if classes is not None:
+                classes = [ v for v in classes if v['dictionaryName'] == dict]
+                if len(classes) > 0:
+                    st.header('☑️ Classes:')
+                    for classe in classes:
+                        with st.expander(f':green[{classe["name"]}]'):                            
+                            st.write(':green[Description]: ' + classe["description"] if 'description' in classe else "")
+                            st.write(':green[Class Type]: ' + classe["classType"] if 'classType' in classe else  ""   )
+                            st.write(':green[Parent Class]: ' + classe["parentClassName"] if 'parentClassName' in classe else "")
+                            st.write(':green[URI]: ' + classe["uri"] if 'uri' in classe else "")
 
-            st.divider()
 
-            #
-            # Convert dataframe to ids
-            #
+            if properties is not None:                
+                properties = [v for v in properties if v['dictionaryName'] == dict]
+                if len(properties) > 0:
+                    st.header('☑️ Properties:')
+                    for property in properties:
+                        with st.expander(f':green[{property["name"]}]'):                            
+                            st.write(':green[Description]: ' + property["description"] if 'description' in property else "")
+                            st.write(':green[URI]: ' + property["uri"] if 'uri' in property else "")
+                            b = st.button('🔎'+ property['name'] + ' Details')
+                            if b:
+                                lcode = [v['isoCode'] for v in languages.json() if v['name'] == language ]
+                                params = {'uri' : property['uri'], 'includeClasses' : True, 'languageCode' : lcode[0] }
+                                response = requests.get(f'https://api.bsdd.buildingsmart.org/api/Property/v4', params=params)
+                                
+                                details = response.json()
+                                st.write(f':blue[Datatype :] {details["dataType"]}')
+                                st.write(f':blue[Definition :] {details["definition"]}')
 
-            my_ids = ids.Ids(title=title,
-                            copyright=copyright,
-                            version=version,
-                            author=author,
-                            description=description,
-                            date=date,
-                            purpose=purpose,
-                            milestone=milestone
-            )
-            for spec, frame in df_group:
-                my_spec = ids.Specification(name=spec[0], description=spec[1], ifcVersion=ifc_version)
-                my_spec.applicability.append(ids.Entity(name=spec[2], predefinedType=None if spec[3] == '' else spec[3]))
-                my_spec.applicability.append(ids.Classification(value=spec[0]))
-                               
-                for index, row in frame.iterrows():
-                    # add property requirement
-                    if row['have restriction'] == 'True' and row['property value'] != '':
-                        value = ids.Restriction(base=row['restriction base'], options={'pattern': row['property value']})
-                    else:
-                        value = None if row['property value'] == '' else row['property value']
-                    property = ids.Property(
-                        name=row['property name'],
-                        value=value,
-                        propertySet=row['property set'],
-                        datatype=row['property type'],
-                        minOccurs=0 if row['optionality'].upper() in ['OPTIONAL', 'PROHIBITED'] else 1,
-                        maxOccurs='unbounded' if row['optionality'].upper() in ['REQUIRED', 'OPTIONAL'] else 0
-                    )
+                                if 'propertyClasses' in details:
+                                    st.subheader(':blue[Associated Classes:]')
+                                    for prop_classes in details['propertyClasses']:    
+                                        st.divider()                                    
+                                        st.write(f':blue[Code :] {prop_classes["code"]}' if 'code' in prop_classes else '')
+                                        st.write(f':blue[Name :] {prop_classes["name"]}' if 'name' in prop_classes else '')
+                                        st.write(f':blue[URI :] {prop_classes["uri"]}' if 'uri' in prop_classes else '')
+                                        st.write(f':blue[Definition :] {prop_classes["definition"]}' if 'definition' in prop_classes else '')
+                                        st.write(f':blue[Description :] {prop_classes["description"]}' if 'description' in prop_classes else '')
+                                        st.write(f':blue[Property Set :] {prop_classes["propertySet"]}' if 'propertySet' in prop_classes else '')
+                                        
+                                        
+                                
 
-                    my_spec.requirements.append(property)
-                my_spec.requirements.append(ids.Material(value=ids.Restriction(base='string', options={'pattern': '.*' + spec[4] + '.*'}))) 
-                my_ids.specifications.append(my_spec)
 
-            st.session_state.ids = my_ids.to_string()
-            if st.session_state.ids is not None:       
-                st.download_button('📥 Download :blue[IDS file]', st.session_state.ids, file_name=st.session_state.file_name, mime='xml')
-                st.session_state.df.to_excel('temp.xlsx', index=False)
-                if os.path.isfile('temp.xlsx'):
-                    with open('temp.xlsx', 'rb') as file:
-                        st.download_button('📥 Download :blue[XLSX file]', file, file_name=st.session_state.file_name.split('.')[0].strip() + '.xlsx', mime='xlsx' )
-            else:
-                st.error('ERRO : File not created!')
+        else:
+            st.error(f'ERRO: {str(response.status_code)} : {response.json()[""]}')
+    else:
+            st.write('Type a search text')
+
+
+
 
