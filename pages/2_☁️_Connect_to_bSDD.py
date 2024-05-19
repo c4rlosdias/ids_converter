@@ -177,64 +177,70 @@ with st.container():
         # Show results
         if response.status_code == 200:
             response_json = response.json()
-            
-            classes = response_json['classes'] if 'classes' in response_json else None
-            dictionaries = response_json['dictionaries'] if 'dictionaries' in response_json else None
-            properties = response_json['properties'] if 'properties' in response_json else None
             total_count = response_json['totalCount']
-            df_classes = pd.DataFrame(classes)
+            if total_count > 0:            
+                classes = response_json['classes'] if 'classes' in response_json else None
+                dictionaries = response_json['dictionaries'] if 'dictionaries' in response_json else None
+                properties = response_json['properties'] if 'properties' in response_json else None
+                
+                df_classes = pd.DataFrame(classes)
 
-            st.write(f'Total count: {total_count}')
-            
-            ldic_names = [d['name'] for d in dictionaries]
-            dict = st.selectbox('Select Dictionary', ldic_names)            
-            uris = [d['uri'] for d in dictionaries if d['name'] == dict]
-            st.write('Dictionary URI:')
-            for uri in uris:
-                st.write(uri)
-
-
-            if classes is not None:
-                classes = [ v for v in classes if v['dictionaryName'] == dict]
-                if len(classes) > 0:
-                    st.header('☑️ Classes:')
-                    for classe in classes:
-                        with st.expander(f':green[{classe["name"]}]'):                            
-                            st.write(':green[Description]: ' + classe["description"] if 'description' in classe else "")
-                            st.write(':green[Class Type]: ' + classe["classType"] if 'classType' in classe else  ""   )
-                            st.write(':green[Parent Class]: ' + classe["parentClassName"] if 'parentClassName' in classe else "")
-                            st.write(':green[URI]: ' + classe["uri"] if 'uri' in classe else "")
+                st.write(f'Total count: {total_count}')
+                
+                ldic_names = [d['name'] for d in dictionaries]
+                dict = st.selectbox('Select Dictionary', ldic_names)            
+                uris = [d['uri'] for d in dictionaries if d['name'] == dict]
+                st.write('Dictionary URI:')
+                for uri in uris:
+                    st.write(uri)
 
 
-            if properties is not None:                
-                properties = [v for v in properties if v['dictionaryName'] == dict]
-                if len(properties) > 0:
-                    st.header('☑️ Properties:')
-                    for property in properties:
-                        with st.expander(f':green[{property["name"]}]'):                            
-                            st.write(':green[Description]: ' + property["description"] if 'description' in property else "")
-                            st.write(':green[URI]: ' + property["uri"] if 'uri' in property else "")
-                            b = st.button('🔎'+ property['name'] + ' Details')
-                            if b:
-                                lcode = [v['isoCode'] for v in languages.json() if v['name'] == language ]
-                                params = {'uri' : property['uri'], 'includeClasses' : True, 'languageCode' : lcode[0] }
-                                response = requests.get(f'https://api.bsdd.buildingsmart.org/api/Property/v4', params=params)
-                                
-                                details = response.json()
-                                st.write(f':blue[Datatype :] {details["dataType"]}')
-                                st.write(f':blue[Definition :] {details["definition"]}')
+                if classes is not None:
+                    classes = [ v for v in classes if v['dictionaryName'] == dict]
+                    if len(classes) > 0:
+                        st.header('☑️ Classes:')
+                        for classe in classes:
+                            with st.expander(f':green[{classe["name"]}]'):                            
+                                st.write(':green[Description]: ' + classe["description"] if 'description' in classe else "")
+                                st.write(':green[Class Type]: ' + classe["classType"] if 'classType' in classe else  ""   )
+                                st.write(':green[Parent Class]: ' + classe["parentClassName"] if 'parentClassName' in classe else "")
+                                st.write(':green[URI]: ' + classe["uri"] if 'uri' in classe else "")
 
-                                if 'propertyClasses' in details:
-                                    st.subheader(':blue[Associated Classes:]')
-                                    for prop_classes in details['propertyClasses']:    
-                                        st.divider()                                    
-                                        st.write(f':blue[Code :] {prop_classes["code"]}' if 'code' in prop_classes else '')
-                                        st.write(f':blue[Name :] {prop_classes["name"]}' if 'name' in prop_classes else '')
-                                        st.write(f':blue[URI :] {prop_classes["uri"]}' if 'uri' in prop_classes else '')
-                                        st.write(f':blue[Definition :] {prop_classes["definition"]}' if 'definition' in prop_classes else '')
-                                        st.write(f':blue[Description :] {prop_classes["description"]}' if 'description' in prop_classes else '')
-                                        st.write(f':blue[Property Set :] {prop_classes["propertySet"]}' if 'propertySet' in prop_classes else '')
-                                        
+
+                if properties is not None:                
+                    properties = [v for v in properties if v['dictionaryName'] == dict]
+                    if len(properties) > 0:
+                        st.header('☑️ Properties:')
+                        for property in properties:
+                            with st.expander(f':green[{property["name"]}]'):                            
+                                st.write(':green[Description]: ' + property["description"] if 'description' in property else "")
+                                st.write(':green[URI]: ' + property["uri"] if 'uri' in property else "")
+                                b = st.button('🔎'+ property['name'] + ' Details')
+                                if b:
+                                    lcode = [v['isoCode'] for v in languages.json() if v['name'] == language ]
+                                    params = {'uri' : property['uri'], 'includeClasses' : True, 'languageCode' : lcode[0] }
+                                    response = requests.get(f'https://api.bsdd.buildingsmart.org/api/Property/v4', params=params)
+                                    
+                                    details = response.json()
+                                    st.write(f':blue[Name :] {details["name"]}' if 'name' in details else '')
+                                    st.write(f':blue[Code :] {details["code"]}' if 'code' in details else '')
+                                    st.write(f':blue[Datatype :] {details["dataType"]}' if 'datatype' in details else '')
+                                    st.write(f':blue[Definition :] {details["definition"]}' if 'definition' in details else '')
+                                    st.write(f':blue[Description :] {details["description"]}' if 'description' in details else '')
+                                    st.write(f':blue[URI :] {details["uri"]}' if 'uri' in details else '')
+
+                                    if 'propertyClasses' in details:
+                                        st.subheader(':blue[Associated Classes:]')
+                                        for prop_classes in details['propertyClasses']:    
+                                            st.divider()                                    
+                                            st.write(f':blue[Code :] {prop_classes["code"]}' if 'code' in prop_classes else '')
+                                            st.write(f':blue[Name :] {prop_classes["name"]}' if 'name' in prop_classes else '')
+                                            st.write(f':blue[URI :] {prop_classes["uri"]}' if 'uri' in prop_classes else '')
+                                            st.write(f':blue[Definition :] {prop_classes["definition"]}' if 'definition' in prop_classes else '')
+                                            st.write(f':blue[Description :] {prop_classes["description"]}' if 'description' in prop_classes else '')
+                                            st.write(f':blue[Property Set :] {prop_classes["propertySet"]}' if 'propertySet' in prop_classes else '')
+            else:
+                st.info(f'⚠️ No occurrences of :blue[{search_text}] were found!')                            
                                         
                                 
 
