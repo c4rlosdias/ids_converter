@@ -269,12 +269,13 @@ with st.container():
                             instructions   = row['instructions'] if row['instructions'] != '' else None
                         ) if row['attribute name'] != '' else None
 
-                        #add property                        
+                        #add property 
+                        ids.Property()                       
 
                         property = ids.Property(
                             uri         = row['URI'] if row['URI'] != '' else None,
                             baseName    = pattern(row['property name']),
-                            value       = pattern(row['property value']),
+                            value       = pattern(row['property value']) if row['property value'] != '' else None,
                             propertySet = pattern(row['property set']),
                             dataType    = row['data type'] if row['data type'] != '' else None,
                             instructions  = row['instructions'] if row['instructions'] != '' else None,
