@@ -158,7 +158,7 @@ with st.container():
                     df_req = st.session_state.df_requirements.query(f"specification == '{spec.iloc[0]}'").fillna('')
                     for index, req in df_req.iterrows():
                         for i in range(df_req.shape[1] - 1):
-                            if req.iloc[i] != '' and df_app.columns.to_list()[i] != 'specification':
+                            if req.iloc[i] != '' and df_req.columns.to_list()[i] != 'specification':
                                 st.write(df_req.columns.to_list()[i] + ' : ' + req.iloc[i])  
 
             st.divider()
