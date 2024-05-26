@@ -182,18 +182,15 @@ with st.container():
                 classes = response_json['classes'] if 'classes' in response_json else None
                 dictionaries = response_json['dictionaries'] if 'dictionaries' in response_json else None
                 properties = response_json['properties'] if 'properties' in response_json else None
-                
+                st.write(dictionaries)
                 df_classes = pd.DataFrame(classes)
-
-                st.write(f'Total count: {total_count}')
-                
+                st.write(f'Total count: {total_count}')                
                 ldic_names = [d['name'] for d in dictionaries]
                 dict = st.selectbox('Select Dictionary', ldic_names)            
                 uris = [d['uri'] for d in dictionaries if d['name'] == dict]
                 st.write('Dictionary URI:')
                 for uri in uris:
                     st.write(uri)
-
 
                 if classes is not None:
                     classes = [ v for v in classes if v['dictionaryName'] == dict]
