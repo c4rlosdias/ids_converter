@@ -197,10 +197,14 @@ with st.container():
 
                 if classes is not None:
                     classes = [ v for v in classes if v['dictionaryName'] == dict]
+                    
                     if len(classes) > 0:
                         st.header('☑️ Classes:')
                         for classe in classes:
-                            with st.expander(f':green[{classe["name"]}]'):                            
+                            labelclass = f'{classe["name"] if "name" in classe else ""}'
+                            with st.expander(labelclass): 
+                                st.write(':green[Reference Code]: ' + classe["referenceCode"] if 'referenceCode' in classe else "") 
+                                st.write(':green[Name]: ' + classe["name"] if 'name' in classe else "")                          
                                 st.write(':green[Description]: ' + classe["description"] if 'description' in classe else "")
                                 st.write(':green[Class Type]: ' + classe["classType"] if 'classType' in classe else  ""   )
                                 st.write(':green[Parent Class]: ' + classe["parentClassName"] if 'parentClassName' in classe else "")
@@ -210,9 +214,10 @@ with st.container():
                 if properties is not None:                
                     properties = [v for v in properties if v['dictionaryName'] == dict]
                     if len(properties) > 0:
+                        
                         st.header('☑️ Properties:')
                         for property in properties:
-                            with st.expander(f':green[{property["name"]}]'):                            
+                            with st.expander(property["name"]):                            
                                 st.write(':green[Description]: ' + property["description"] if 'description' in property else "")
                                 st.write(':green[URI]: ' + property["uri"] if 'uri' in property else "")
                                 b = st.button('🔎'+ property['name'] + ' Details')
