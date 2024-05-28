@@ -113,7 +113,6 @@ with st.container():
         st.session_state.df_requirements   = pd.read_excel(uploaded_file, dtype=str, skiprows=2, sheet_name="REQUIREMENTS")
         st.session_state.file_name=uploaded_file.name.split('.')[0] + '.ids'
 
-        st.dataframe(st.session_state.df_applicability)
            
         if st.session_state.df_specifications  is not None:
             st.session_state.df_specifications = st.session_state.df_specifications.fillna('')

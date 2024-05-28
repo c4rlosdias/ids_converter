@@ -32,7 +32,7 @@ with st.sidebar:
 # Introduction screen
 # =========================================================================================================================
 
-st.header("IDS Converter v1.1")
+st.header("IDS Converter v1.0")
 st.write('By Carlos Dias') 
 st.write('_(Update 240526)_')
 st.markdown('')
