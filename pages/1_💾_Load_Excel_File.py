@@ -111,10 +111,12 @@ with st.container():
         st.session_state.df_specifications = pd.read_excel(uploaded_file, dtype=str, skiprows=2, sheet_name="SPECIFICATIONS")
         st.session_state.df_applicability  = pd.read_excel(uploaded_file, dtype=str, skiprows=2, sheet_name="APPLICABILITY")
         st.session_state.df_requirements   = pd.read_excel(uploaded_file, dtype=str, skiprows=2, sheet_name="REQUIREMENTS")
-
         st.session_state.file_name=uploaded_file.name.split('.')[0] + '.ids'
+
+        st.dataframe(st.session_state.df_applicability)
            
         if st.session_state.df_specifications  is not None:
+            st.session_state.df_specifications = st.session_state.df_specifications.fillna('')
 
             st.header('IDS Information')
             col1, col2 = st.columns(2, gap="large")
@@ -130,6 +132,8 @@ with st.container():
                 description = st.text_input('_Description:_')
                 purpose     = st.text_input('_Purpose:_')
                 milestone   = st.text_input('_Milestone:_')
+
+            
 
             st.divider()
             st.markdown(':white_check_mark: :green[check your specifications:]')
@@ -188,6 +192,7 @@ with st.container():
                     
                     df_app_spec = st.session_state.df_applicability.query(f"specification == '{spec.iloc[0]}'").fillna('')
                     df_req_spec = st.session_state.df_requirements.query(f"specification == '{spec.iloc[0]}'").fillna('')
+                    
 
                     # create applicability
                     for index, row in df_app_spec.iterrows():                        
@@ -330,8 +335,9 @@ with st.container():
                 
                 try:
                     st.session_state.ids = my_ids.to_string()
-                except:
+                except Exception as ex:
                     st.error("ERRO : Review your spreadsheet, there's something wrong with your specification!")
+                    st.write(ex)
                     st.session_state.ids = None
 
                 if st.session_state.ids is not None:
