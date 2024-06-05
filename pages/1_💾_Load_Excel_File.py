@@ -136,14 +136,19 @@ with st.container():
 
             st.divider()
             st.markdown(':white_check_mark: :green[check your specifications:]')
+            st.dataframe(st.session_state.df_specifications)
+            st.dataframe(st.session_state.df_applicability)
 
             for index, spec in st.session_state.df_specifications.iterrows():
                 with st.expander(':green[Specification Name : ]' + spec.iloc[0]):
                     st.markdown(f':green[Description : ]{spec.iloc[1]}')
                     st.markdown(f':green[Optionality : ]{spec.iloc[2]}')
 
+                    df_app = st.session_state.df_applicability
+                    df_app = df_app[df_app['specification'] == spec.iloc[0]]                 
+                    df_app = df_app.fillna('')
+
                     st.markdown(f':green[Applied to : ]')
-                    df_app = st.session_state.df_applicability.query(f"specification == '{spec.iloc[0]}'").fillna('')
                     for index, app in df_app.iterrows():
                         for i in range(df_app.shape[1] - 1):
                             if app.iloc[i] != '' and df_app.columns.to_list()[i] != 'specification':
@@ -158,7 +163,10 @@ with st.container():
                     else:
                         st.markdown(f':green[requirements: ]')
 
-                    df_req = st.session_state.df_requirements.query(f"specification == '{spec.iloc[0]}'").fillna('')
+                    df_req = st.session_state.df_requirements
+                    df_req = df_req[df_req["specification"]== spec.iloc[0]]
+                    df_req = df_req.fillna('')
+
                     for index, req in df_req.iterrows():
                         for i in range(df_req.shape[1] - 1):
                             if req.iloc[i] != '' and df_req.columns.to_list()[i] != 'specification':
@@ -189,8 +197,13 @@ with st.container():
                         ifcVersion=ifc_version
                     )
                     
-                    df_app_spec = st.session_state.df_applicability.query(f"specification == '{spec.iloc[0]}'").fillna('')
-                    df_req_spec = st.session_state.df_requirements.query(f"specification == '{spec.iloc[0]}'").fillna('')
+                    df_app_spec = st.session_state.df_applicability
+                    df_app_spec = df_app_spec[df_app_spec["specification"] == spec.iloc[0]]
+                    df_app_spec = df_app_spec.fillna('')
+
+                    df_req_spec = st.session_state.df_requirements                    
+                    df_req_spec = df_req_spec[df_req_spec["specification"] == spec.iloc[0]]
+                    df_req_spec = df_req_spec.fillna('')
                     
 
                     # create applicability
