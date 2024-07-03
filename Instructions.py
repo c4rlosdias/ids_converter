@@ -42,7 +42,7 @@ st.image('./resources/img/schema.png', width=450)
 st.markdown('')
 st.markdown('IDs is a standard that describes information exchange requirements and has incredible potential. ' +
             'This converter, however, serves to create an ids with specifications according to the facets described' +
-            'In sheets applicability and requirements. IDS Converter is compatible with version 0.9.7 of IDS')
+            'In sheets applicability and requirements. IDS Converter is compatible with version 1.0 of IDS')
 st.markdown('')
 st.markdown('_IDS Converter uses [IfcOpenShell](http://ifcopenshell.org/)_')
 st.divider()
