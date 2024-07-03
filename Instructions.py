@@ -34,7 +34,7 @@ with st.sidebar:
 
 st.header("IDS Converter v1.0")
 st.write('By Carlos Dias') 
-st.write('_(Update 240605)_')
+st.write('_(Update 240703)_')
 st.markdown('')
 st.markdown('IDS Converter generates an :blue[IDS file] from an :green[Excel file].')
 st.markdown('')

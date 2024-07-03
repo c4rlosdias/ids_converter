@@ -26,26 +26,29 @@ from . import reporter
 
 parser = argparse.ArgumentParser(description="Uses an IDS to audit an IFC")
 parser.add_argument("ids", type=str, help="Path to an IDS")
-parser.add_argument("ifc", type=str, help="Path to an IFC")
+parser.add_argument("ifc", type=str, help="Path to an IFC", nargs="?")
 parser.add_argument(
     "-r", "--reporter", type=str, help="The reporting method to view audit results", default="Console"
 )
 parser.add_argument(
-    "--no-color", help="Disable colour output supported by Console reporting", action="store_true"
+    "--no-color", help="Disable colour output (supported by Console reporting)", action="store_true"
 )
 parser.add_argument(
-    "-o", "--output", help="Output file supported by Json reporting"
+    "--excel-safe", help="Make sure exported ODS is safely exported for Excel", action="store_true"
+)
+parser.add_argument(
+    "-o", "--output", help="Output file (supported for all types of reporting except Console)"
 )
 args = parser.parse_args()
 
-start = time.time()
 specs = ids.open(args.ids)
-ifc = ifcopenshell.open(args.ifc)
-print("Finished loading:", time.time() - start)
-start = time.time()
-specs.validate(ifc)
-print("Finished validating:", time.time() - start)
-start = time.time()
+if args.ifc:
+    start = time.time()
+    ifc = ifcopenshell.open(args.ifc)
+    print("Finished loading:", time.time() - start)
+    start = time.time()
+    specs.validate(ifc)
+    print("Finished validating:", time.time() - start)
 
 if args.reporter == "Console":
     engine = reporter.Console(specs, use_colour=not args.no_color)
@@ -56,7 +59,9 @@ elif args.reporter == "Json":
 elif args.reporter == "Html":
     engine = reporter.Html(specs)
 elif args.reporter == "Ods":
-    engine = reporter.Ods(specs)
+    engine = reporter.Ods(specs, excel_safe=args.excel_safe)
+elif args.reporter == "OdsSummary":
+    engine = reporter.OdsSummary(specs, excel_safe=args.excel_safe)
 elif args.reporter == "Bcf":
     engine = reporter.Bcf(specs)
 

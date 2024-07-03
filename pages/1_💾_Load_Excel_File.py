@@ -1,7 +1,7 @@
 import pandas as pd
 import streamlit as st
 import datetime
-from ifctester import ids
+from modules.ifctester import ids
 from PIL import Image
 
 
