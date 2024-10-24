@@ -11,8 +11,8 @@ from PIL import Image
 def pattern(value):
     result = None if value == '' else value
     try:
-        if ',' in value:
-            enums = [j.strip() for j in value.split(',')]
+        if '|' in value:
+            enums = [j.strip() for j in value.split('|')]
             if isinstance(enums[0], str):
                 base = "string"
             elif isinstance(enums[0], int):
