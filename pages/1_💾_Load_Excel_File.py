@@ -136,8 +136,6 @@ with st.container():
 
             st.divider()
             st.markdown(':white_check_mark: :green[check your specifications:]')
-            st.dataframe(st.session_state.df_specifications)
-            st.dataframe(st.session_state.df_applicability)
 
             for index, spec in st.session_state.df_specifications.iterrows():
                 with st.expander(':green[Specification Name : ]' + spec.iloc[0]):
@@ -161,7 +159,7 @@ with st.container():
                     elif spec.iloc[2] == 'OPTIONAL':
                         st.markdown(f':green[MAY HAVE: ]')
                     else:
-                        st.markdown(f':green[requirements: ]')
+                        st.markdown(f':green[Requirements: ]')
 
                     df_req = st.session_state.df_requirements
                     df_req = df_req[df_req["specification"]== spec.iloc[0]]

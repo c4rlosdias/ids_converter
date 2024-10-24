@@ -181,8 +181,7 @@ with st.container():
             if total_count > 0:            
                 classes = response_json['classes'] if 'classes' in response_json else None
                 dictionaries = response_json['dictionaries'] if 'dictionaries' in response_json else None
-                properties = response_json['properties'] if 'properties' in response_json else None
-                st.write(dictionaries)
+                properties = response_json['properties'] if 'properties' in response_json else None                
                 df_classes = pd.DataFrame(classes)
                 st.write(f'Total count: {total_count}')                
                 ldic_names = [d['name'] for d in dictionaries]
