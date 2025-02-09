@@ -21,7 +21,7 @@ st.set_page_config(
 
 with st.sidebar:
     
-    st.title('IDS Converter v1.1')
+    st.title('IDS Converter v2.0')
     st.image('./resources/img/LOGO 1X1_2.PNG', width=150)
     st.write('https://openbimacademy.com.br/')
     st.write('Choose a option above:')
@@ -34,9 +34,9 @@ with st.sidebar:
 # Introduction screen
 # =========================================================================================================================
 
-st.header("IDS Converter v1.0")
+st.header("IDS Converter v2.0")
 st.write('By Carlos Dias') 
-st.write('_(Update 25 out 2024)_')
+st.write('_(Last update 09 fev 2025)_')
 st.markdown('')
 st.markdown('IDS Converter generates an :blue[IDS file] from an :green[Excel file].')
 st.markdown('')

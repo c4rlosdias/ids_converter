@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import streamlit as st
 import datetime
 from modules.ifctester import ids
@@ -86,13 +87,7 @@ if 'convert' not in st.session_state:
     st.session_state.convert = False
 
 
-# =========================================================================================================================
-# Sidebar
-# =========================================================================================================================
-
-with st.sidebar:  
-
-    uploaded_file = st.file_uploader("📥 Choose a XLSX file", type=['xlsx'])       
+  
 
 
 # =========================================================================================================================
@@ -101,39 +96,32 @@ with st.sidebar:
 
 with st.container():
     
-    
+    uploaded_file = st.file_uploader("📥 Choose a XLSX file", type=['xlsx']) 
     # Create Dataframe
 
     if uploaded_file:
 
         st.session_state.convert = False
- 
-        st.session_state.df_specifications = pd.read_excel(uploaded_file, dtype=str, skiprows=2, sheet_name="SPECIFICATIONS")
-        st.session_state.df_applicability  = pd.read_excel(uploaded_file, dtype=str, skiprows=2, sheet_name="APPLICABILITY")
-        st.session_state.df_requirements   = pd.read_excel(uploaded_file, dtype=str, skiprows=2, sheet_name="REQUIREMENTS")
-        st.session_state.file_name=uploaded_file.name.split('.')[0] + '.ids'
 
+        st.session_state.df_ids_information = pd.read_excel(uploaded_file, dtype=str, skiprows=1, sheet_name="IDS_INFORMATION") 
+        st.session_state.df_ids_information = st.session_state.df_ids_information.replace({np.nan : None})
+        st.session_state.df_specifications  = pd.read_excel(uploaded_file, dtype=str, skiprows=2, sheet_name="SPECIFICATIONS")
+        st.session_state.df_applicability   = pd.read_excel(uploaded_file, dtype=str, skiprows=2, sheet_name="APPLICABILITY")
+        st.session_state.df_requirements    = pd.read_excel(uploaded_file, dtype=str, skiprows=2, sheet_name="REQUIREMENTS")
+        st.session_state.file_name=uploaded_file.name.split('.')[0] + '.ids'
+        
+        ids_info = {}
            
         if st.session_state.df_specifications  is not None:
             st.session_state.df_specifications = st.session_state.df_specifications.fillna('')
 
-            st.header('IDS Information')
-            col1, col2 = st.columns(2, gap="large")
-            with col1:
-                title       = st.text_input('_Title:_')
-                copyright   = st.text_input('_Copyright:_')
-                version     = st.text_input('_Version:_')
-                author      = st.text_input('_Author:_', 'xxxxx@xxxxx.xxx')
-                ifc_version = st.selectbox('_IFC Version:_', ('IFC2X3', 'IFC4', 'IFC4X3_ADD2'))
+            st.header('ℹ️ :blue[IDS Infomation:]')
 
-            with col2:
-                date        = st.text_input('_Date:_', datetime.date.today())
-                description = st.text_input('_Description:_')
-                purpose     = st.text_input('_Purpose:_')
-                milestone   = st.text_input('_Milestone:_')
+            for index, info in st.session_state.df_ids_information.iterrows():
+                    st.markdown(f':blue[{info.iloc[0]} : ] {info.iloc[1]}')
+                    ids_info[info.iloc[0]] = info.iloc[1]
 
             
-
             st.divider()
             st.markdown(':white_check_mark: :green[check your specifications:]')
 
@@ -177,14 +165,14 @@ with st.container():
             #
             submitted = st.button("Convert to IDS ▶️")
             if submitted:
-                my_ids = ids.Ids(title=title,
-                                copyright=copyright,
-                                version=version,
-                                author=author,
-                                description=description,
-                                date=date,
-                                purpose=purpose,
-                                milestone=milestone
+                my_ids = ids.Ids(title=ids_info['Title'],
+                                copyright=ids_info['Copyright'],
+                                version=ids_info['IDS Version'],
+                                author=ids_info['Author (email)'],
+                                description=ids_info['Description'],
+                                date=ids_info['Date'],
+                                purpose=ids_info['Purpose'],
+                                milestone=ids_info['Milestone']
                 )
                 for index, spec in st.session_state.df_specifications.iterrows():
                     my_spec = ids.Specification(
@@ -192,7 +180,7 @@ with st.container():
                         description=spec.iloc[1],
                         minOccurs=0 if spec.iloc[2].upper() in ['OPTIONAL', 'PROHIBITED'] else 1,
                         maxOccurs='unbounded' if spec.iloc[2].upper() in ['REQUIRED', 'OPTIONAL'] else 0,
-                        ifcVersion=ifc_version
+                        ifcVersion=ids_info['IFC Version']
                     )
                     
                     df_app_spec = st.session_state.df_applicability
