@@ -82,12 +82,9 @@ if 'df_requirement' not in st.session_state:
 if 'file_name' not in st.session_state:
     st.session_state.file_name = None
 
-
 if 'convert' not in st.session_state:
     st.session_state.convert = False
-
-
-  
+ 
 
 
 # =========================================================================================================================
@@ -285,6 +282,19 @@ with st.container():
                             cardinality = row['cardinality']
                         ) if row['property name'] != '' else None
 
+                        #add property (bSDD)
+                        ids.Property()                       
+
+                        property2 = ids.Property(
+                            uri         = row['URI'] if row['URI'] != '' else None,
+                            baseName    = pattern(row['property name(bSDD)'].split('[')[0].strip()),
+                            value       = pattern(row['property value(bSDD)'].split('[')[0].strip()) if row['property value(bSDD)'] != '' else None,
+                            propertySet = pattern(row['property set(bSDD)'].split('[')[0].strip()),
+                            dataType    = row['data type(bSDD)'].split('[')[0].strip() if row['data type(bSDD)'] != '' else None,
+                            instructions  = row['instructions'] if row['instructions'] != '' else None,
+                            cardinality = row['cardinality']
+                        ) if row['property name(bSDD)'] != '' else None
+
                         # add classification
 
                         classification = ids.Classification(
@@ -319,6 +329,8 @@ with st.container():
                             my_spec.requirements.append(attribute)
                         if property:
                             my_spec.requirements.append(property)
+                        if property2:
+                            my_spec.requirements.append(property2)
                         if classification:
                             my_spec.requirements.append(classification)
                         if material:
