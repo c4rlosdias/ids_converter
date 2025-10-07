@@ -151,6 +151,7 @@ if 'domain_active' not in st.session_state:
     st.session_state.domain_active = ''
 
 
+
 # =========================================================================================================================
 # Sidebar
 # =========================================================================================================================
@@ -205,6 +206,38 @@ with st.container():
                                 st.write(':green[Class Type]: ' + classe["classType"] if 'classType' in classe else  ""   )
                                 st.write(':green[Parent Class]: ' + classe["parentClassName"] if 'parentClassName' in classe else "")
                                 st.write(':green[URI]: ' + classe["uri"] if 'uri' in classe else "")
+            
+                                if st.button('🔎 Property Sets', key=classe['name']):
+                                    params2 = {'Classuri' : classe['uri']}
+                                    response2 = requests.get(f'https://api.bsdd.buildingsmart.org/api/Class/Properties/v1', params=params2)
+                                    class_properties = response2.json()
+                                    df_props = pd.DataFrame(class_properties['classProperties'])
+
+                                    for group_name, group in df_props.groupby('propertySet'):
+                                        col1, col2 = st.columns([0.3, 0.7])
+                                        with col1:
+                                            st.write(f'📋 :green[Property Set:] {group_name}')
+                                        with col2:
+                                            with st.popover('Properties', width="stretch"):
+                                                st.data_editor(
+                                                    group[['name','description',  'propertyCode', 'uri', 'dataType', 'propertyValueKind']],
+                                                    column_config={
+                                                        "uri" : st.column_config.LinkColumn("URI"),                                           
+                                                    },
+                                                    disabled=True,
+                                                    hide_index=True
+                                                )
+                                        st.divider()
+                                    # for prop in class_properties['classProperties']:
+                                    #     st.write(f':blue[Name :] {prop["name"]}' if 'name' in prop else '')
+                                    #     st.write(f':blue[Code :] {prop["propertyCode"]}' if 'propertyCode' in prop else '')
+                                    #     st.write(f':blue[Description :] {prop["description"]}' if 'description' in prop else '')
+                                    #     st.write(f':blue[Property set :] {prop["propertySet"]}' if 'propertySet' in prop else '')
+                                    #     st.write(f':blue[Data type :] {prop["dataType"]}' if 'dataType' in prop else '')
+                                    #     st.write(f':blue[URI :] {prop["uri"]}' if 'uri' in prop else '')
+                                    #     st.divider()
+
+
 
 
                 if properties is not None:                
