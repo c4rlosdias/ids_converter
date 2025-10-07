@@ -194,8 +194,8 @@ with st.container():
                         # add entity
                         
                         entity = ids.Entity(
-                            name=pattern(row['entity name']),
-                            predefinedType = pattern(row['predefined type'])
+                            name=pattern(row['entity name'].upper()),
+                            predefinedType = pattern(row['predefined type'].upper())
                         ) if row['entity name'] != '' else None
                         
                         #add attribute                        
@@ -227,6 +227,8 @@ with st.container():
                             value = pattern(row['material name'])
                         ) if row['material name'] != '' else None
 
+                        
+
                         # add parts
 
                         parts = ids.PartOf(
@@ -255,8 +257,8 @@ with st.container():
                         # add entity
 
                         entity = ids.Entity(
-                            name           = pattern(row['entity name']),
-                            predefinedType = pattern(row['predefined type']),
+                            name           = pattern(row['entity name'].upper()),
+                            predefinedType = pattern(row['predefined type'].upper()),
                             instructions   = row['instructions'] if row['instructions'] != '' else None
                         ) if row['entity name'] != '' else None
 
@@ -287,10 +289,10 @@ with st.container():
 
                         property2 = ids.Property(
                             uri         = row['URI'] if row['URI'] != '' else None,
-                            baseName    = pattern(row['property name(bSDD)'].split('[')[0].strip()),
-                            value       = pattern(row['property value(bSDD)'].split('[')[0].strip()) if row['property value(bSDD)'] != '' else None,
-                            propertySet = pattern(row['property set(bSDD)'].split('[')[0].strip()),
-                            dataType    = row['data type(bSDD)'].split('[')[0].strip() if row['data type(bSDD)'] != '' else None,
+                            baseName    = pattern(row['property name(bSDD)'].split('[')[0].rstrip()),
+                            value       = pattern(row['property value(bSDD)'].split('[')[0].rstrip()) if row['property value(bSDD)'] != '' else None,
+                            propertySet = pattern(row['property set(bSDD)'].split('[')[0].rstrip()),
+                            dataType    = row['data type(bSDD)'].split('[')[0].rstrip() if row['data type(bSDD)'] != '' else None,
                             instructions  = row['instructions'] if row['instructions'] != '' else None,
                             cardinality = row['cardinality']
                         ) if row['property name(bSDD)'] != '' else None
