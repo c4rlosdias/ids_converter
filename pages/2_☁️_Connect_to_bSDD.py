@@ -4,7 +4,6 @@ import os.path
 import requests
 import streamlit as st
 import datetime
-from ifctester import ids
 from PIL import Image
 
 
