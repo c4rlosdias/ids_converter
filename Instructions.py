@@ -21,7 +21,7 @@ st.set_page_config(
 
 with st.sidebar:
     
-    st.title('IDS Converter v1.251008')
+    st.title('IDS Converter v1.251013')
     st.image('./resources/img/LOGO 1X1_2.PNG', width=150)
     st.write('https://openbimacademy.com.br/')
     st.write('Choose a option above:')
@@ -34,7 +34,7 @@ with st.sidebar:
 # Introduction screen
 # =========================================================================================================================
 
-st.header("IDS Converter v1.251008")
+st.header("IDS Converter v1.251013")
 st.write('By Carlos Dias') 
 st.write('_(Last update 09 fev 2025)_')
 st.markdown('')
