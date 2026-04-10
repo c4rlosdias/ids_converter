@@ -2,8 +2,8 @@ import pandas as pd
 import numpy as np
 import streamlit as st
 import datetime
-#from modules.ifctester import ids
-from ifctester import ids
+from modules.ifctester import ids
+#from ifctester import ids
 from PIL import Image
 
 
