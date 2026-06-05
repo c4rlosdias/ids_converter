@@ -16,7 +16,13 @@
 - Typ `powershell` en druk op Enter
 
 ### 3. Installeer de benodigde software (eenmalig)
-Kopieer en plak dit commando in PowerShell:
+
+**Voor alleen convert.py (minimaal, aangeraden):**
+```powershell
+pip install -r requirements-minimal.txt
+```
+
+**Voor de volledige app met UI:**
 ```powershell
 pip install -r requirements.txt
 ```

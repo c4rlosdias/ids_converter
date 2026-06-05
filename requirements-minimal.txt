@@ -1,0 +1,5 @@
+pandas==2.2.2
+openpyxl==3.1.2
+ifcopenshell==0.8.3.post2
+ifctester==0.0.240423
+lark==1.1.9
