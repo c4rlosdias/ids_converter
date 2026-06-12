@@ -1,0 +1,134 @@
+<ids xmlns="http://standards.buildingsmart.org/IDS" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://standards.buildingsmart.org/IDS http://standards.buildingsmart.org/IDS/1.0/ids.xsd">
+    <info>
+        <title>Untitled</title>
+        <version>1.0</version>
+    </info>
+    <specifications>
+        <specification name="specification 1" ifcVersion="IFC4" description="all walls must have the name attribute with the value format: Wnnn">
+            <applicability minOccurs="1" maxOccurs="unbounded">
+                <entity>
+                    <name>
+                        <simpleValue>IFCWALL</simpleValue>
+                    </name>
+                </entity>
+            </applicability>
+            <requirements>
+                <attribute cardinality="required">
+                    <name>
+                        <simpleValue>Name</simpleValue>
+                    </name>
+                    <value>
+                        <xs:restriction base="xs:string">
+                            <xs:pattern value="W[0-9]" />
+                        </xs:restriction>
+                    </value>
+                </attribute>
+                <property dataType="IFCLABEL" uri="https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3/prop/Name" cardinality="required">
+                    <propertySet>
+                        <simpleValue>Pset_BeamCommon</simpleValue>
+                    </propertySet>
+                    <baseName>
+                        <simpleValue>FireRating</simpleValue>
+                    </baseName>
+                </property>
+            </requirements>
+        </specification>
+        <specification name="specification 2" ifcVersion="IFC4" description="all walls must have the property Firerating">
+            <applicability minOccurs="1" maxOccurs="unbounded">
+                <entity>
+                    <name>
+                        <simpleValue>IFCWALL</simpleValue>
+                    </name>
+                </entity>
+            </applicability>
+            <requirements>
+                <property dataType="IFCLABEL" cardinality="required">
+                    <propertySet>
+                        <simpleValue>Pset_WallCommon</simpleValue>
+                    </propertySet>
+                    <baseName>
+                        <simpleValue>FireRating</simpleValue>
+                    </baseName>
+                </property>
+            </requirements>
+        </specification>
+        <specification name="specification 3" ifcVersion="IFC4" description="all beams and walls must have the property Is External">
+            <applicability minOccurs="1" maxOccurs="unbounded">
+                <entity>
+                    <name>
+                        <xs:restriction base="xs:string">
+                            <xs:enumeration value="IFCWALL" />
+                            <xs:enumeration value="IFCBEAM" />
+                        </xs:restriction>
+                    </name>
+                </entity>
+            </applicability>
+            <requirements>
+                <property dataType="IFCBOOLEAN" cardinality="required">
+                    <propertySet>
+                        <xs:restriction base="xs:string">
+                            <xs:pattern value="Pset_.*Common" />
+                        </xs:restriction>
+                    </propertySet>
+                    <baseName>
+                        <simpleValue>IsExternal</simpleValue>
+                    </baseName>
+                </property>
+            </requirements>
+        </specification>
+        <specification name="specification 4" ifcVersion="IFC4" description="all slabs must have a property called 'my_prop' in the propert set 'my_pset' with data type IFCLABEL and value 'teste' ">
+            <applicability minOccurs="1" maxOccurs="unbounded">
+                <entity>
+                    <name>
+                        <simpleValue>IFCSLAB</simpleValue>
+                    </name>
+                </entity>
+            </applicability>
+            <requirements>
+                <property dataType="IFCLABEL" cardinality="required">
+                    <propertySet>
+                        <simpleValue>my_pset</simpleValue>
+                    </propertySet>
+                    <baseName>
+                        <simpleValue>my_prop</simpleValue>
+                    </baseName>
+                    <value>
+                        <simpleValue>teste</simpleValue>
+                    </value>
+                </property>
+            </requirements>
+        </specification>
+        <specification name="specification 5" ifcVersion="IFC4" description="all columns with concrete material must have the property 'XYZ' with data type IFCINTEGER in the property set 'my_pset' and the property IsExternal (bSDD)">
+            <applicability minOccurs="1" maxOccurs="unbounded">
+                <entity>
+                    <name>
+                        <simpleValue>IFCCOLUMN</simpleValue>
+                    </name>
+                </entity>
+                <material>
+                    <value>
+                        <simpleValue>concrete</simpleValue>
+                    </value>
+                </material>
+            </applicability>
+            <requirements>
+                <property dataType="IFCINTEGER" cardinality="required">
+                    <propertySet>
+                        <simpleValue>my_pset</simpleValue>
+                    </propertySet>
+                    <baseName>
+                        <simpleValue>XYZ</simpleValue>
+                    </baseName>
+                </property>
+                <property dataType="IFCBOOLEAN" cardinality="required">
+                    <propertySet>
+                        <simpleValue>Pset_ColumnCommon</simpleValue>
+                    </propertySet>
+                    <baseName>
+                        <simpleValue>IsExternal</simpleValue>
+                    </baseName>
+                </property>
+            </requirements>
+        </specification>
+    </specifications>
+</ids>
